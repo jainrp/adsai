@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BS ADSAI - Multi-Concentration Planner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Geist",system-ui,sans-serif;font-size:15px;background:var(--color-background-tertiary);color:var(--color-text-primary)}
+:root{
+  --ink:#0d1117;--muted:var(--color-text-secondary);--line:var(--color-border-tertiary);
+  --success:#166534;--success-bg:#dcfce7;--warn:#B45309;--danger:#C53030;
+  --c-req:#2C4A99;--c-flex:#5894E0;--c-col:#6FC2E8;--c-pre:#E8970D;
+  --c-mc:#2D5F3F;--c-found:#3CA85F;--c-focus:#94D9A4;
+  --c-conc:#8755D6;--c-celec:#C8B7E8;--c-cap:#C53030;--c-free:#A0A6B0;
+  --color-background-tertiary: #f3f4f6; --color-background-secondary: #f9fafb; --color-background-primary: #ffffff;
+  --color-text-primary: #111827; --color-text-secondary: #4b5563;
+  --color-border-tertiary: #e5e7eb; --color-border-secondary: #d1d5db;
+}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+.wrap{display:grid;grid-template-columns:270px 1fr;min-height:600px}
+.sidebar{background:#0d1117;color:#fafaf7;padding:16px;display:flex;flex-direction:column;gap:16px;font-size:13px;height:100vh;overflow-y:auto;}
+.brand-title{font-size:17px;font-weight:600;line-height:1.2;margin-bottom:4px;color:#fafaf7}
+.brand-sub{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+.nav-label{font-size:12px;font-weight:700;-webkit-font-smoothing:antialiased;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px}
+
+select.conc-select {
+  width: 100%; padding: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); 
+  border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: 600; font-size: 13px;
+  cursor: pointer; outline: none; margin-bottom: 10px;
+}
+select.conc-select option { background: #0d1117; color: white; }
+
+/* Sidebar Banks Styles with Scroll Constraints */
+.bank-container { padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; max-height: 135px; overflow-y: auto; }
+.bank-container::-webkit-scrollbar { width: 4px; }
+.bank-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+.sidebar-course { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fafaf7; margin-bottom: 4px; padding: 6px 8px; border-radius: 4px; cursor: grab; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.sidebar-course:last-child { margin-bottom: 0; }
+.sidebar-course:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+.sidebar-course .ccode { color: rgba(255,255,255,0.6); font-family: monospace; font-size: 12px; font-weight: 700; display: block; }
+.sidebar-course .ctitle { display: block; font-weight: 500; font-size: 11px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.4); }
+
+.tool-btn{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:4px;font-size:12px;color:rgba(255,255,255,.5);background:transparent;border:1px solid rgba(255,255,255,.12);cursor:pointer;width:100%}
+.tool-btn:hover{background:rgba(255,255,255,.08);color:#fafaf7}
+.toolbar{margin-top:auto;display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
+
+.main{padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;height:100vh;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between}
+.eyebrow{font-size:11px;font-weight:700;-webkit-font-smoothing:antialiased;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+h1{font-size:22px;font-weight:600;line-height:1.2}
+.conc-lbl{color:var(--c-conc);font-style:italic}
+.hdr-meta{text-align:right;font-size:12px;color:var(--muted);line-height:1.6;white-space:nowrap}
+
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stat-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 12px;border-top:2px solid var(--sc,var(--c-mc))}
+.stat-lbl{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.stat-val{font-size:21px;font-weight:600;line-height:1}
+.stat-val .u{font-size:13px;color:var(--muted);font-weight:400}
+.stat-bar{height:3px;background:var(--color-border-tertiary);border-radius:2px;margin:5px 0 3px}
+.stat-bar-fill{height:100%;background:var(--sc,var(--c-mc));border-radius:2px;transition:width .4s}
+.stat-sub{font-size:11px;color:var(--muted);line-height:1.4}
+
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 10px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;font-size:12px}
+.legend-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.li{display:inline-flex;align-items:center;gap:4px;color:var(--color-text-secondary)}
+.ld{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sem{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:1.1fr .9fr;gap:0 12px;position:relative;overflow:hidden;transition:box-shadow .2s, opacity .2s}
+.sem.disabled {opacity: 0.4; pointer-events: none; filter: grayscale(1); background: #f9fafb;}
+.sem::before{content:"";position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--c-req)}
+.sem.done::before{background:var(--success)}
+.sem.drag-ok{box-shadow:0 0 0 2px var(--c-conc);background:#f9f6ff}
+.sem.drag-no{box-shadow:0 0 0 2px var(--danger);background:#fff5f5}
+
+.lcol{display:flex;flex-direction:column;min-width:0}
+.rcol{padding-left:12px;border-left:0.5px solid var(--color-border-tertiary);min-width:0}
+.sem-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:5px}
+.sem-lbl{font-weight:600;font-size:15px}
+.sem-title{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sem-cr{font-size:11px;color:var(--muted);font-family:monospace;margin-left:5px}
+.sem-cr strong{color:var(--success)}
+.sem-cr.overload {color: var(--danger); font-weight: 800;}
+
+.courses{list-style:none;display:flex;flex-direction:column;gap:2px;min-height:40px}
+.course{display:flex;align-items:center;gap:5px;padding:4px 7px;border-radius:4px;cursor:grab;border:0.5px solid transparent;transition:background .12s,border-color .12s;position:relative;user-select:none;background:#fff;}
+.course:hover{background:var(--color-background-secondary);border-color:var(--color-border-tertiary)}
+.course.dragging{opacity:.35;border-style:dashed;border-color:var(--color-border-secondary)}
+.course.fys{opacity:.5;cursor:default}
+.course.moved .ccode::after{content:"↕";color:var(--c-conc);font-size:11px;margin-left:3px}
+
+.course.placeholder { border: 1.5px dashed var(--color-border-secondary); background: rgba(0,0,0,0.015); opacity: 0.8; cursor: default; }
+.course.placeholder:hover { background: rgba(0,0,0,0.03); border-color: var(--c-conc); }
+.course.placeholder .cicon { opacity: 0.5; }
+
+.cicon{width:12px;height:12px;flex-shrink:0;color:var(--muted)}
+.ctext{flex:1;min-width:0}
+.ccode{font-family:monospace;font-size:13px;font-weight:700;color:var(--ink);display:block;line-height:1.2}
+.ctitle{font-size:12px;font-weight:500;color:var(--muted);display:block;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.cr-chip{font-family:monospace;font-size:10px;color:var(--muted)}
+.flag{font-size:10px;color:var(--warn);font-weight:700}
+.grade-chip{font-family:monospace;font-size:10px;padding:1px 3px;border-radius:3px;background:var(--success-bg);color:var(--success);font-weight:600}
+.grip{width:11px;height:11px;flex-shrink:0;color:var(--muted);opacity:0;transition:opacity .15s}
+.course:hover .grip{opacity:.7}
+
+.course-remove{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:13px;cursor:pointer;opacity:0;transition:opacity .15s,background .12s;background:var(--color-background-primary);border:1px solid var(--color-border-secondary);color:var(--muted);padding:0;line-height:1;z-index:2;box-shadow:-4px 0 6px var(--color-background-primary)}
+.course:hover .course-remove{opacity:1}
+.course-remove:hover{background:rgba(197,48,48,.12);color:var(--danger);border-color:var(--danger)}
+.drop-ph{height:28px;border:1.5px dashed var(--c-conc);border-radius:4px;background:rgba(135,85,214,.04);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--c-conc);pointer-events:none;margin:2px 0}
+.sem-note{margin-top:6px;padding:5px 7px;background:rgba(180,83,9,.06);border:0.5px solid rgba(180,83,9,.25);border-radius:4px;font-size:11px;line-height:1.35;color:var(--warn)}
+.sem-note strong{color:var(--warn);font-weight:700}
+.drop-ph.no{border-color:var(--danger);background:rgba(197,48,48,.04);color:var(--danger)}
+
+.bktitle{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bkgroups{display:flex;flex-direction:column;gap:7px}
+.bkglbl{font-size:10px;font-weight:700;-webkit-font-smoothing:antialiased;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.bkrows{display:flex;flex-direction:column;gap:3px}
+.bkrow{display:flex;align-items:center;gap:4px}
+.bkname{font-size:10px;color:var(--muted);width:72px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bksvg{width:88px;height:10px;display:block}
+.bkct{font-family:monospace;font-size:10px;color:var(--muted);width:20px;text-align:right}
+
+.footnotes{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;padding:10px 12px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;font-size:11px;line-height:1.5;color:var(--color-text-secondary)}
+.footnotes strong{color:var(--color-text-primary);font-weight:600;display:block;font-size:11px;margin-bottom:2px}
+.fn-mark{color:var(--warn);font-weight:700}
+
+.tooltip{position:fixed;z-index:500;background:#0d1117;color:#fafaf7;padding:8px 10px;border-radius:8px;font-size:12px;line-height:1.45;max-width:260px;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.tooltip.vis{opacity:1;transform:translateY(0)}
+.tooltip strong{display:block;font-weight:600;margin-bottom:3px}
+.tt-meta{color:rgba(250,250,247,.6);font-size:11px;margin-bottom:5px;font-family:monospace}
+.tt-row{display:flex;gap:5px;margin-top:4px;font-size:11px;border-top:0.5px solid rgba(255,255,255,0.1);padding-top:4px;}
+.tt-key{color:rgba(250,250,247,.5);text-transform:uppercase;letter-spacing:.08em;font-size:10px;flex-shrink:0;width:52px}
+.tt-val{color:#fafaf7;flex:1}
+.tt-hint{margin-top:6px;padding-top:6px;border-top:0.5px solid rgba(255,255,255,.12);color:rgba(250,250,247,.5);font-size:11px;font-style:italic}
+
+.editor-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:none;align-items:center;justify-content:center}
+.editor-overlay.vis{display:flex}
+.editor{background:#ffffff;color:#0d1117;border-radius:12px;padding:20px;width:340px;max-width:calc(100vw - 24px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.editor h3{font-size:16px;margin-bottom:3px;color:#000}
+.editor-meta{font-size:12px;color:#4b5563;margin-bottom:12px}
+.ed-sec{margin-bottom:12px}
+.ed-sec-lbl{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4b5563;margin-bottom:6px}
+.status-opts{display:flex;gap:5px;flex-wrap:wrap}
+.sopt{padding:4px 9px;border-radius:4px;font-size:12px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;color:#4b5563}
+.sopt:hover{border-color:var(--c-mc);color:var(--c-mc)}
+.sopt.active{background:#0d1117;color:#ffffff;border-color:#0d1117}
+.grade-grid{display:flex;flex-wrap:wrap;gap:4px}
+.gopt{width:35px;height:28px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;font-size:12px;font-family:monospace;font-weight:500;color:#000}
+.gopt:hover{border-color:var(--success);color:var(--success)}
+.gopt.active{background:var(--success);color:white;border-color:var(--success)}
+.ed-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:14px;border-top:0.5px solid var(--color-border-tertiary);padding-top:12px}
+.btn{padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;border:0.5px solid var(--color-border-secondary);background:transparent;color:#000}
+.btn.primary{background:#0d1117;color:#fafaf7;border-color:#0d1117}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(20px);background:#0d1117;color:#fafaf7;padding:8px 16px;border-radius:999px;font-size:13px;z-index:600;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+.toast.vis{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.warn{background:var(--warn)}
+.toast.err{background:var(--danger)}
+</style>
+</head>
+<body>
+
+<h2 class="sr-only">BS in ADSAI Multi-Concentration Degree Planner</h2>
+<div class="wrap">
+<aside class="sidebar">
+  <div>
+    <div class="brand-sub">Baruch · Zicklin</div>
+    <div class="brand-title">BS in Applied<br>Data Science &amp; AI</div>
+  </div>
+  
+  <div>
+    <div class="nav-label">Select Concentration</div>
+    <select id="conc-select" class="conc-select">
+      <option value="business_psychology">Business Psychology</option>
+      <option value="cognitive_neuroscience" selected>Cognitive Neuroscience</option>
+      <option value="cybersecurity">Cybersecurity</option>
+      <option value="entrepreneurship">Entrepreneurship</option>
+      <option value="journalism">Journalism</option>
+      <option value="marketing">Marketing</option>
+      <option value="operations">Operations & Analytics</option>
+      <option value="public_policy">Public Policy</option>
+    </select>
+  </div>
+
+  <div style="margin-top: 10px; flex: 1; min-height: 0; display: flex; flex-direction: column;">
+    <div class="nav-label" style="color:var(--c-focus)">ADSAI Electives (Choose 3)</div>
+    <ul class="courses bank-container" data-si="-1" id="adsai-bank"></ul>
+    
+    <div class="nav-label" style="color:var(--c-conc); margin-top:5px;"><span id="conc-elec-lbl">Domain Electives</span></div>
+    <ul class="courses bank-container" data-si="-1" id="conc-bank"></ul>
+
+    <div class="nav-label" style="color:var(--c-cap); margin-top:5px; display:none;" id="conc-cap-lbl-wrap"><span id="conc-cap-lbl">Domain Capstone</span></div>
+    <ul class="courses bank-container" data-si="-1" id="cap-bank" style="display:none;"></ul>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool-btn" id="btn-share">↑ Share plan</button>
+    <button class="tool-btn" id="btn-reset">↺ Reset plan</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">Interactive Degree Map</div>
+      <h1>BS in ADSAI <span class="conc-lbl" id="hdr-conc-name">— Cognitive Neuroscience</span></h1>
+    </div>
+    <div class="hdr-meta"><strong>4-Year Course Plan</strong><br>120 credits · 51–54 in major · 61 LAS min<br>Concentration: <span id="hdr-conc-cr" style="color:var(--c-conc);font-weight:600">19 credits</span></div>
+  </div>
+  <div class="dashboard" id="dashboard"></div>
+  <div class="legend" id="legend"></div>
+  <div class="grid" id="grid"></div>
+  <div class="footnotes" id="footnotes">
+    <div><strong><span class="fn-mark">*</span> Non-LAS alternatives</strong>STA 3250 and STA 3154 do not carry Liberal Arts designation.</div>
+    <div id="dynamic-fn"><strong><span class="fn-mark">†</span> Pathways Prerequisites</strong>PSY 1001 and PSY 2100 are required for this concentration.</div>
+    <div><strong>Drag to reschedule</strong>Drag electives from the sidebar or move existing courses. Empty placeholders serve as drop cues.</div>
+  </div>
+</main>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="editor-overlay" id="eo"><div class="editor" id="ed"></div></div>
+<div class="toast" id="toast"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-write" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="i-calc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><circle cx="9" cy="12" r=".6" fill="currentColor"/><circle cx="12" cy="12" r=".6" fill="currentColor"/><circle cx="15" cy="12" r=".6" fill="currentColor"/><circle cx="9" cy="16" r=".6" fill="currentColor"/><circle cx="12" cy="16" r=".6" fill="currentColor"/><circle cx="15" cy="16" r=".6" fill="currentColor"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></symbol>
+<symbol id="i-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.04-4.79A2.5 2.5 0 0 1 4 11.5a2.5 2.5 0 0 1 1-2 2.5 2.5 0 0 1 1-4.5 2.5 2.5 0 0 1 3.5-3zm5 0a2.5 2.5 0 0 1 3.5 3 2.5 2.5 0 0 1 1 4.5 2.5 2.5 0 0 1 1 2 2.5 2.5 0 0 1-1.5 2.25 2.5 2.5 0 0 1-1.04 4.79A2.5 2.5 0 0 1 12 19.5v-15A2.5 2.5 0 0 1 14.5 2z"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1z"/><path d="M7 21H17"/><path d="M12 3v18"/><path d="M3 7h18"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></symbol>
+<symbol id="i-microscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8"/><path d="M3 21h18"/><path d="M14 21v-4a2 2 0 0 0-2-2H6"/><path d="M14 3v4"/><path d="M18 7V3"/><path d="M22 7H10"/><path d="M10 11V7"/></symbol>
+<symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+<symbol id="i-network" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-grad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6"/><path d="M10 3v7l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+<symbol id="i-grip" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="7" r="1.2"/><circle cx="15" cy="7" r="1.2"/><circle cx="9" cy="12" r="1.2"/><circle cx="15" cy="12" r="1.2"/><circle cx="9" cy="17" r="1.2"/><circle cx="15" cy="17" r="1.2"/></symbol>
+</defs></svg>
+
+<script>
+const BUCKETS=[
+  {id:"required",name:"Required Core",total:4,color:"--c-req",group:"pathways"},
+  {id:"flex",name:"Flex Core",total:6,color:"--c-flex",group:"pathways"},
+  {id:"college",name:"College Option",total:4,color:"--c-col",group:"pathways"},
+  {id:"pre",name:"Pre-BS ADSAI",total:3,color:"--c-pre",group:"major"},
+  {id:"mcore",name:"ADSAI Core",total:5,color:"--c-mc",group:"major"},
+  {id:"found",name:"ADSAI Foundation",total:5,color:"--c-found",group:"major"},
+  {id:"focus",name:"ADSAI Electives",total:3,color:"--c-focus",group:"major"},
+  {id:"conc",name:"Concentration",total:5,color:"--c-conc",group:"spec",splitAt:3},
+  {id:"cap",name:"Capstone",total:1,color:"--c-cap",group:"spec"},
+  {id:"free",name:"Free Electives",total:2,color:"--c-free",group:"spec"}
+];
+const GROUPS=[{id:"pathways",label:"Pathways"},{id:"major",label:"Major"},{id:"spec",label:"Specialization"}];
+const STATUSES=[{id:"not_taken",label:"Not yet"},{id:"planned",label:"Planned"},{id:"in_progress",label:"In Progress"},{id:"completed",label:"Completed"}];
+const GRADES=[{l:"A",g:4},{l:"A-",g:3.7},{l:"B+",g:3.3},{l:"B",g:3},{l:"B-",g:2.7},{l:"C+",g:2.3},{l:"C",g:2},{l:"C-",g:1.7},{l:"D",g:1},{l:"F",g:0}];
+
+// Data store for all concentration variants with discrete counts
+const CONC_DATA = {
+  business_psychology: {
+    name: "Business Psychology", shortName: "Bus Psych", cr: 19, req_count: 3, elec_count: 2, cap_count: 1, fn: "Pathways pre-reqs: PSY 1001 & PSY 2100. Co-requisite: PHI/PSY 3290 (fulfills AI/Ethics core).",
+    req: [
+      {id:"bp_c1", code:"PSY 3001", title:"Research Methods in Psychology", cr:4, ic:"i-microscope", pr:["PSY 1001", "Math/Quant"], prereqText:"PSY 1001 & (STA 2000 or PSY 2100)"},
+      {id:"bp_c2", code:"PSY 3181", title:"Industrial & Organizational Psych", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"bp_c3", code:"PSY 3056", title:"Social Psychology", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"}
+    ],
+    elec: [
+      {id:"bp_e1", code:"PSY 3064", title:"Personality & Indiv Differences", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"bp_e2", code:"PSY 3151", title:"Financial Psychology", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"bp_e3", code:"PSY 3036", title:"Psychology of Culture", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"bp_e4", code:"PSY 3069", title:"Psychology of Law", cr:3, ic:"i-scale", pr:["PSY 1001"], prereqText:"PSY 1001"}
+    ],
+    cap: [
+      {id:"bp_cp1", code:"PSY 4013", title:"Advanced Personnel Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
+      {id:"bp_cp2", code:"PSY 4181", title:"Advanced Organizational Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
+      {id:"bp_cp3", code:"PSY 4182", title:"Occupational Health Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
+      {id:"bp_cp4", code:"PSY 4183", title:"Psych of Career Development", cr:3, ic:"i-target", prereqText:"Check Dept Details"}
+    ],
+    layout: { f2: ["bp_c1"], s2: ["bp_c2", "bp_c3"] }
+  },
+  cognitive_neuroscience: {
+    name: "Cognitive Neuroscience", shortName: "Neuro", cr: 19, req_count: 3, elec_count: 2, cap_count: 1, fn: "Pathways pre-reqs: PSY 1001 & PSY 2100. Co-requisite: PHI/PSY 3290 (fulfills AI/Ethics core).",
+    req: [
+      {id:"cn_c1", code:"PSY 3001", title:"Research Methods in Psychology", cr:4, ic:"i-microscope", pr:["PSY 1001", "Math/Quant"], prereqText:"PSY 1001 & (STA 2000 or PSY 2100)"},
+      {id:"cn_c2", code:"PSY 3081", title:"Cognitive Psychology", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"cn_c3", code:"PSY 3082", title:"Mind, Brain, and Behavior", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"}
+    ],
+    elec: [
+      {id:"cn_e1", code:"PSY 3067", title:"Psych of Learning & Motivation", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"cn_e2", code:"PSY 3083", title:"Psychology of Learning", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"cn_e3", code:"PSY 3185", title:"Environmental Psychology", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"}
+    ],
+    cap: [
+      {id:"cn_cp1", code:"PSY 4080", title:"Sensation and Perception", cr:3, ic:"i-eye", prereqText:"PSY 3081 or PSY 3082"},
+      {id:"cn_cp2", code:"PSY 3040m", title:"Spec Topics: Memory & Attention", cr:3, ic:"i-brain", prereqText:"PSY 3081 or PSY 3082"},
+      {id:"cn_cp3", code:"PSY 3040d", title:"Spec Topics: Decision Making", cr:3, ic:"i-brain", prereqText:"PSY 3081 or PSY 3082"}
+    ],
+    layout: { f2: ["cn_c1"], s2: ["cn_c2", "cn_c3"] }
+  },
+  cybersecurity: {
+    name: "Cybersecurity", shortName: "Cyber", cr: 21, req_count: 5, elec_count: 2, cap_count: 0, fn: "No specific Pathways requirements.",
+    req: [
+      {id:"cy_c1", code:"CIS 3500", title:"Computer Networking", cr:3, ic:"i-network", prereqText:"CIS 2200"},
+      {id:"cy_c2", code:"CIS 3550", title:"Cybersecurity", cr:3, ic:"i-network", prereqText:"CIS 2200"},
+      {id:"cy_c3", code:"CIS 3800", title:"Cloud Computing", cr:3, ic:"i-network", prereqText:"CIS 2200"},
+      {id:"cy_c4", code:"CIS 4350", title:"IT Audit", cr:3, ic:"i-network", pr:["CIS 3400"], prereqText:"CIS 3400 or ACC 3202"},
+      {id:"cy_c5", code:"CIS 4560", title:"Ethical Hacking", cr:3, ic:"i-code", pr:["CIS 3550"], prereqText:"CIS 3550"}
+    ],
+    elec: [
+      {id:"cy_e1", code:"CIS 3770", title:"Usability, Privacy & Security", cr:3, ic:"i-network"},
+      {id:"cy_e2", code:"CIS 4093", title:"Spec Topics Software Eng", cr:3, ic:"i-code"},
+      {id:"cy_e3", code:"CIS 4160", title:"Web App Development", cr:3, ic:"i-code"},
+      {id:"cy_e4", code:"CIS 4510", title:"Digital Forensics", cr:3, ic:"i-microscope"},
+      {id:"cy_e5", code:"LAW 3108", title:"Law and the Internet", cr:3, ic:"i-scale"}
+    ],
+    cap: [],
+    layout: { f2: ["cy_c1"], s2: ["cy_c2", "cy_c3"], s3: ["cy_c4"], f4: ["cy_c5"] }
+  },
+  entrepreneurship: {
+    name: "Entrepreneurship", shortName: "ENT", cr: 21, req_count: 3, elec_count: 4, cap_count: 0, fn: "Major Capstone uses ENT 5985 instead of CIS 5800.",
+    req: [
+      {id:"en_c1", code:"ENT 3950", title:"Dev Entrepreneurial Mindset", cr:3, ic:"i-sparkles"},
+      {id:"en_c2", code:"ENT 3952", title:"Designing for Innovation", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_c3", code:"ENT 3960", title:"Pre-Launch Journey", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"}
+    ],
+    elec: [
+      {id:"en_e1", code:"ENT 3962", title:"Family Enterprise Dynamics", cr:3, ic:"i-sparkles"},
+      {id:"en_e2", code:"ENT 3963", title:"Forecasting and Futuring", cr:3, ic:"i-trend"},
+      {id:"en_e3", code:"ENT 3968", title:"The Art of Persuasion", cr:3, ic:"i-mic"},
+      {id:"en_e4", code:"ENT 3971", title:"Multicultural Ent Experiences", cr:3, ic:"i-sparkles"},
+      {id:"en_e5", code:"ENT 3993", title:"Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles"},
+      {id:"en_e6", code:"ENT 4954", title:"New Venture Funding", cr:3, ic:"i-chart"},
+      {id:"en_e7", code:"ENT 4960", title:"New Venture Management", cr:3, ic:"i-sparkles"},
+      {id:"en_e8", code:"ENT 4967", title:"Tech & Innovation in Ent", cr:3, ic:"i-code"},
+      {id:"en_e9", code:"ENT 4969", title:"Social Entrepreneurship", cr:3, ic:"i-scale"},
+      {id:"en_e10", code:"ENT 4993", title:"Adv Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles"}
+    ],
+    cap: [],
+    layout: { f2: ["en_c1"], s2: ["en_c2", "en_c3"] }
+  },
+  journalism: {
+    name: "Journalism", shortName: "JRN", cr: 19, req_count: 3, elec_count: 3, cap_count: 0, fn: "Recommends 1000-level HIS in Pathways.",
+    req: [
+      {id:"jr_c1", code:"JRN 2500", title:"The Individual and the News", cr:3, ic:"i-write", prereqText:"ENG 2100"},
+      {id:"jr_c2", code:"JRN 3050/3200", title:"Reporting / Fin Journalism", cr:4, ic:"i-write", prereqText:"ENG 2150"},
+      {id:"jr_c3", code:"JRN 3220", title:"Media Ethics and Law", cr:3, ic:"i-scale", prereqText:"ENG 2150"}
+    ],
+    elec: [
+      {id:"jr_e1", code:"JRN 3201/2", title:"Covering Markets/Wealth", cr:3, ic:"i-write", prereqText:"ENG 2150"},
+      {id:"jr_e2", code:"JRN 3510/30", title:"Multimedia/Podcasting", cr:3, ic:"i-mic", prereqText:"Check Dept Details"},
+      {id:"jr_e3", code:"HIS 3053", title:"American History 1945+", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
+      {id:"jr_e4", code:"HIS 3074", title:"Econ History of Latin America", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
+      {id:"jr_e5", code:"HIS 3410", title:"Hist of American Business", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
+      {id:"jr_e6", code:"POL 2353", title:"Public Policy", cr:3, ic:"i-book", prereqText:"POL 1101"},
+      {id:"jr_e7", code:"POL 3103", title:"Political Economy", cr:3, ic:"i-chart", prereqText:"POL 1101"},
+      {id:"jr_e8", code:"POL 3220", title:"State and Local Government", cr:3, ic:"i-book", prereqText:"POL 1101"}
+    ],
+    cap: [],
+    layout: { f2: ["jr_c1"], s2: ["jr_c2", "jr_c3"] }
+  },
+  marketing: {
+    name: "Marketing", shortName: "Mkt", cr: 21, req_count: 3, elec_count: 4, cap_count: 0, fn: "No specific Pathways requirements.",
+    req: [
+      {id:"mk_c1", code:"MKT 3000", title:"Marketing Foundations", cr:3, ic:"i-chart", prereqText:"45 credits & Zicklin standing"},
+      {id:"mk_c2", code:"MKT 3600", title:"Mkt Info for Decision Making", cr:3, ic:"i-chart", pr:["MKT 3000", "Math/Quant"], prereqText:"MKT 3000 & STA 2000"},
+      {id:"mk_c3", code:"MKT 3620", title:"Digital Transformation of Mkt", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"}
+    ],
+    elec: [
+      {id:"mk_e1", code:"MKT 4123", title:"Mkt Web Analytics", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
+      {id:"mk_e2", code:"MKT 4555", title:"Advanced Digital Marketing", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
+      {id:"mk_e3", code:"MKT 4557", title:"Digital Advertising", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
+      {id:"mk_e4", code:"MKT 4561", title:"Marketing Analytics", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
+      {id:"mk_e5", code:"MKT 4620", title:"Text Analytics for Mkt", cr:3, ic:"i-write", prereqText:"Check Dept Details"},
+      {id:"mk_e6", code:"MKT 4630", title:"Mkt Analytics with Big Data", cr:3, ic:"i-db", prereqText:"Check Dept Details"}
+    ],
+    cap: [],
+    layout: { f2: ["mk_c1"], s2: ["mk_c2", "mk_c3"] }
+  },
+  operations: {
+    name: "Operations & Analytics", shortName: "OPM", cr: 21, req_count: 4, elec_count: 3, cap_count: 0, fn: "No specific Pathways requirements.",
+    req: [
+      {id:"op_c1", code:"OPM 3000", title:"Service Operations Mgmt", cr:3, ic:"i-network", prereqText:"ECO 1001, ECO 1002, STA 2000"},
+      {id:"op_c2", code:"OPM 3730", title:"Business Process Analysis", cr:3, ic:"i-network", pr:["OPM 3000"], prereqText:"OPM 3000"},
+      {id:"op_c3", code:"OPM 3750", title:"Improving Bus Processes", cr:3, ic:"i-trend", pr:["OPM 3000"], prereqText:"OPM 3000"},
+      {id:"op_c4", code:"OPM 4550", title:"Adv Managerial Decision Mkg", cr:3, ic:"i-target", pr:["OPM 3000"], prereqText:"OPM 3000 & (STA 3000 or 3154)"}
+    ],
+    elec: [
+      {id:"op_e1", code:"OPM 3710", title:"Supply Chain Management", cr:3, ic:"i-network"},
+      {id:"op_e2", code:"OPM 3740", title:"Project Management", cr:3, ic:"i-target"},
+      {id:"op_e3", code:"OPM 4500", title:"Cases in Operations Mgmt", cr:3, ic:"i-book"},
+      {id:"op_e4", code:"OPM 4551", title:"Operations Mgmt Consulting", cr:3, ic:"i-mic"}
+    ],
+    cap: [],
+    layout: { f2: ["op_c1"], s2: ["op_c2", "op_c3"], s3: ["op_c4"] }
+  },
+  public_policy: {
+    name: "Public Policy", shortName: "Pub Pol", cr: 21, req_count: 4, elec_count: 3, cap_count: 0, fn: "No specific Pathways requirements.",
+    req: [
+      {id:"pp_c1", code:"PAF 3010", title:"Race, Inequality & Pub Policy", cr:3, ic:"i-scale", prereqText:"ENG 2100"},
+      {id:"pp_c2", code:"PAF 3015", title:"Qualitative Studies", cr:3, ic:"i-write", prereqText:"ENG 2100"},
+      {id:"pp_c3", code:"PAF 3102", title:"Economic Analysis of Policy", cr:3, ic:"i-chart", prereqText:"ENG 2150 & ECO 1001"},
+      {id:"pp_c4", code:"PAF 3108", title:"Strategic Comm Public Causes", cr:3, ic:"i-mic", prereqText:"ENG 2100"}
+    ],
+    elec: [
+      {id:"pp_e1", code:"PAF 3006", title:"Public Service", cr:3, ic:"i-book"},
+      {id:"pp_e2", code:"PAF 3018", title:"Immigrant Cities", cr:3, ic:"i-book"},
+      {id:"pp_e3", code:"PAF 3021", title:"Civic Engagement / Participatory Budgeting", cr:3, ic:"i-book"},
+      {id:"pp_e4", code:"PAF 3100", title:"Nonprofit Administration", cr:3, ic:"i-book"},
+      {id:"pp_e5", code:"PAF 3103", title:"Economics of Public Sector", cr:3, ic:"i-chart"},
+      {id:"pp_e6", code:"PAF 3195", title:"Energy, Climate, and Society", cr:3, ic:"i-flask"},
+      {id:"pp_e7", code:"PAF 3375", title:"Housing & Community Dev Policy", cr:3, ic:"i-book"},
+      {id:"pp_e8", code:"PAF 3402", title:"Policy Analysis", cr:3, ic:"i-write"},
+      {id:"pp_e9", code:"PAF 3442", title:"Cities and Sustainability", cr:3, ic:"i-book"},
+      {id:"pp_e10", code:"PAF 3710", title:"Reforming Education", cr:3, ic:"i-book"}
+    ],
+    cap: [],
+    layout: { f2: ["pp_c1"], s2: ["pp_c2", "pp_c3"], s3: ["pp_c4"] }
+  }
+};
+
+const BASE_ADSAI_ELECTIVES = [
+  {id:"e_cis3120", code:"CIS 3120", title:"Programming for Analytics", cr:3, bk:"focus", ic:"i-code", pr:["Programming"], prereqText:"CIS 2300 or MTH 3300"},
+  {id:"e_cis4100", code:"CIS 4100", title:"Data Structures and Algorithms", cr:3, bk:"focus", ic:"i-code", pr:["CIS 3120"], prereqText:"CIS 3100 or CIS 3120"},
+  {id:"e_cis4120", code:"CIS 4120", title:"Applied NLP", cr:3, bk:"focus", ic:"i-code", pr:["CIS 3920", "CIS 3120"], prereqText:"CIS 3920 and CIS 3120"},
+  {id:"e_cis4130", code:"CIS 4130", title:"Big Data Technologies", cr:3, bk:"focus", ic:"i-db", pr:["CIS 3400"], prereqText:"CIS 3400"},
+  {id:"e_cis4170", code:"CIS 4170", title:"Data Visualization", cr:3, bk:"focus", ic:"i-chart", pr:["Programming"], prereqText:"CIS 2300 or CIS 3120"},
+  {id:"e_cis4400", code:"CIS 4400", title:"Data Warehousing", cr:3, bk:"focus", ic:"i-db", pr:["CIS 3400"], prereqText:"CIS 3400"},
+  {id:"e_sta4157", code:"STA 4157", title:"Experimental Design for ML", cr:3, bk:"focus", ic:"i-chart", pr:["STA 4155"], prereqText:"STA 4155"},
+  {id:"e_sta4158", code:"STA 4158", title:"Analysis of Time Series", cr:3, bk:"focus", ic:"i-trend", pr:["STA 3000"], prereqText:"STA 3000 or STA 3154"},
+  {id:"e_sta4950", code:"STA 4950", title:"Machine Learning and AI", cr:3, bk:"focus", ic:"i-network", pr:["CIS 3920"], prereqText:"STA 3950 or CIS 3920"}
+];
+
+let state={}, plan={}, activeConc="cognitive_neuroscience";
+let SEMESTERS=[], AVAILABLE_ELECTIVES=[];
+const GPA_GATE_IDS=["f1c2","f1c3","s1c2"];
+
+function cById(id){
+  for(const s of SEMESTERS)for(const c of s.courses)if(c.id===id)return c;
+  for(const c of AVAILABLE_ELECTIVES) if(c.id===id) return c;
+  return null;
+}
+function cByCodeQuery(codeSub){
+  for(const s of SEMESTERS)for(const c of s.courses){
+    if(c.code.includes(codeSub)) return c;
+    if(c.title && c.title.includes(codeSub)) return c;
+  }
+  for(const c of AVAILABLE_ELECTIVES){
+    if(c.code.includes(codeSub)) return c;
+    if(c.title && c.title.includes(codeSub)) return c;
+  }
+  return null;
+}
+function origSi(id){
+  for(const s of SEMESTERS)for(const c of s.courses)if(c.id===id)return s.si;
+  return -1;
+}
+function effSi(id){return plan[id]!==undefined?plan[id]:origSi(id)}
+function getSt(id){return(state[id]&&state[id].s)||"not_taken"}
+function getGr(id){return state[id]&&state[id].g}
+function setSt(id,s){if(!state[id])state[id]={};state[id].s=s;if(s!=="completed")delete state[id].g;if(!state[id].s||state[id].s==="not_taken")delete state[id]}
+function setGr(id,l){if(!state[id])state[id]={s:"completed"};state[id].g=l}
+
+function buildModel(concKey) {
+  const cData = CONC_DATA[concKey];
+  activeConc = concKey;
+  
+  AVAILABLE_ELECTIVES = [...BASE_ADSAI_ELECTIVES];
+  cData.elec.forEach(c => AVAILABLE_ELECTIVES.push({...c, bk:"conc"}));
+  cData.cap.forEach(c => AVAILABLE_ELECTIVES.push({...c, bk:"conc", isCap:true}));
+  
+  // Set UI Labels
+  document.getElementById('hdr-conc-name').textContent = `— ${cData.name}`;
+  document.getElementById('hdr-conc-cr').textContent = `${cData.cr} credits`;
+  document.getElementById('dynamic-fn').innerHTML = `<strong><span class="fn-mark">†</span> Contextual Rules</strong>${cData.fn}`;
+  
+  document.getElementById('conc-elec-lbl').textContent = `${cData.shortName} Electives (Choose ${cData.elec_count})`;
+  
+  const capWrap = document.getElementById('conc-cap-lbl-wrap');
+  const capBank = document.getElementById('cap-bank');
+  
+  if (cData.cap_count > 0) {
+      capWrap.style.display = 'block';
+      capBank.style.display = 'block';
+      document.getElementById('conc-cap-lbl').textContent = `${cData.shortName} Capstone (Choose ${cData.cap_count})`;
+  } else {
+      capWrap.style.display = 'none';
+      capBank.style.display = 'none';
+  }
+
+  const concBucket = BUCKETS.find(b=>b.id==='conc');
+  concBucket.total = cData.req_count + cData.elec_count + cData.cap_count;
+  concBucket.splitAt = cData.req_count;
+
+  // Auto-generate placeholder keys from counts; strip any hardcoded ones from layout
+  const _layout = {};
+  for(const k of Object.keys(cData.layout))
+    _layout[k] = cData.layout[k].filter(id => !id.startsWith('e_ph') && !id.startsWith('c_ph'));
+  const phKeys = [];
+  for(let i=0;i<cData.elec_count;i++) phKeys.push(`e_ph${i+1}`);
+  for(let i=0;i<cData.cap_count;i++) phKeys.push(`c_ph${i+1}`);
+  _layout.s3 = [...(_layout.s3||[]), ...(phKeys.length>0 ? [phKeys[0]] : [])];
+  _layout.f4 = [...(_layout.f4||[]), ...phKeys.slice(1)];
+
+  const getSlot = (layoutKey, idx) => {
+    const sID = _layout[layoutKey] && _layout[layoutKey][idx];
+    if(!sID) return null;
+    if(sID.startsWith('e_ph')) return {id:`ph_${layoutKey}_${idx}`, code:"—", title:`${cData.shortName} Elective`, cr:3, bk:"conc", isPlaceholder:true, ic:"i-book"};
+    if(sID.startsWith('c_ph')) return {id:`ph_${layoutKey}_${idx}`, code:"—", title:`${cData.shortName} Capstone`, cr:3, bk:"conc", isPlaceholder:true, isCap:true, ic:"i-target"};
+    const reqCourse = cData.req.find(r => r.id === sID);
+    return reqCourse ? {...reqCourse, bk:"conc", req:true} : null;
+  };
+
+  const adCap = concKey === 'entrepreneurship' 
+    ? {id:"s4c1",code:"ENT 5985",title:"Ent in the Wild",cr:3,bk:"cap",ic:"i-target",pr:["ENT 3950"], prereqText:"ENT 3950, 3952, & 3960"}
+    : {id:"s4c1",code:"CIS 5800/5000",title:"IT Dev & Project Management",cr:3,bk:"cap",ic:"i-target",pr:["CIS 3120"], prereqText:"CIS 3120 & Senior Status"};
+
+  // Pathways overrides
+  let mathCode = "PSY/BIO/ENV 2100 or STA 2000";
+  let sciCode = "Scientific World";
+  let mathFlag = "";
+  let sciFlag = "";
+  let ethicsCode = "PHI 3280/90/70, JRN 3220, ENG 4025, or PAF 3020";
+  let ethicsTitle = "Technology/AI Ethics";
+  let ethicsPrereq = "Depends on Course (e.g. PHI 1000, ENG 2150)";
+  let ethicsFlag = "";
+  let opmPrereq = "STA 2000 or PSY/BIO/ENV 2100";
+
+  if(concKey === 'business_psychology' || concKey === 'cognitive_neuroscience') {
+      mathCode = "PSY 2100";
+      sciCode = "PSY 1001";
+      mathFlag = "†";
+      sciFlag = "†";
+      ethicsCode = "PHI/PSY 3290";
+      ethicsTitle = "Psychology of Ethics (AI/Ethics)";
+      ethicsPrereq = "One 1000-level PHI course";
+      ethicsFlag = "†";
+      opmPrereq = "PSY 2100";
+  }
+
+  SEMESTERS = [
+    {year:1,si:0,label:"Fall · Year 1",title:"Foundations",ribbon:true,courses:[
+      {id:"f1c1",code:"ENG 2100",title:"English Composition I",cr:3,bk:"required",ic:"i-write",prereqText:"Placement"},
+      {id:"f1c2",code:"MTH 2600/2610",title:"Calculus I",cr:4,bk:"pre",ic:"i-calc",prereqText:"Math Placement"},
+      {id:"f1c3",code:"CIS 2300/MTH 3300",title:"Programming",cr:3,bk:"pre",ic:"i-code",prereqText:"None / MTH 2610"},
+      {id:"f1c4",code:sciCode,title:"Scientific World",cr:3,bk:"flex",ic:"i-compass",dual:true,flag:sciFlag,prereqText:"Varies"},
+      {id:"f1c5",code:"—",title:"World Cultures and Global Issues",cr:3,bk:"flex",ic:"i-compass",prereqText:"Varies"},
+      {id:"f1c6",code:"FYS 1000",title:"First Year Seminar",cr:0,bk:null,ic:"i-book",fys:true},
+    ]},
+    {year:1,si:1,label:"Spring · Year 1",title:"Foundations",courses:[
+      {id:"s1c1",code:"ENG 2150",title:"English Composition II",cr:3,bk:"required",ic:"i-write",pr:["ENG 2100"],prereqText:"ENG 2100"},
+      {id:"s1c2",code:"CIS 3400",title:"Database Management Systems",cr:3,bk:"pre",ic:"i-db",pr:["Programming"],prereqText:"CIS 2200 or CIS 2300"},
+      {id:"s1c3",code:mathCode,title:"Math/Quant Reasoning",cr:3,bk:"required",ic:"i-chart",dual:true,flag:mathFlag,prereqText:"Math Placement"},
+      {id:"s1c4",code:"—",title:"Life / Physical Science",cr:3,bk:"required",ic:"i-flask"},
+      {id:"s1c5",code:"—",title:"U.S. Experience in its Diversity",cr:3,bk:"flex",ic:"i-compass"},
+    ]},
+    {year:2,si:2,label:"Fall · Year 2",title:"Math & Discipline Core",courses:[
+      {id:"f2c1",code:"MTH 3210/4100",title:"Linear Algebra",cr:3,bk:"mcore",ic:"i-calc",pr:["Calculus I"],prereqText:"MTH 2610 or MTH 3010"},
+      {id:"f2c2",code:ethicsCode,title:ethicsTitle,cr:3,bk:"mcore",ic:"i-scale",flag:ethicsFlag,prereqText:ethicsPrereq},
+      {id:"f2c3",code:"COM 1010",title:"Speech Communication",cr:3,bk:"mcore",ic:"i-mic",prereqText:"None"},
+      getSlot('f2',0), getSlot('f2',1),
+      {id:"f2c6",code:"ENG 2800",title:"Great Works of Literature I",cr:3,bk:"college",ic:"i-book",pr:["ENG 2150"],prereqText:"ENG 2150"}
+    ].filter(Boolean)},
+    {year:2,si:3,label:"Spring · Year 2",title:"Math & Discipline Core",courses:[
+      {id:"s2c1",code:"MTH 2301/3150/STA 3250",title:"Discrete Mathematics",cr:3,bk:"mcore",ic:"i-calc",pr:["Calculus I"],prereqText:"MTH 2610"},
+      {id:"s2c2",code:"MTH 3120/4120/STA 3154",title:"Probability",cr:3,bk:"mcore",ic:"i-chart",pr:["Calculus I"],prereqText:"MTH 2610 or Calc II/III"},
+      {id:"s2c3",code:"STA 3000",title:"Statistical Computing",cr:3,bk:"found",ic:"i-chart",pr:["Math/Quant"],prereqText:"STA 2000"},
+      getSlot('s2',0), getSlot('s2',1), getSlot('s2',2)
+    ].filter(Boolean)},
+    {year:3,si:4,label:"Fall · Year 3",title:"Advanced AI & Modeling",courses:[
+      {id:"f3c1",code:"CIS 3920/STA 3950",title:"Machine Learning Analytics",cr:3,bk:"found",ic:"i-network",pr:["Programming", "Math/Quant"],prereqText:"CIS 2300 or STA 3000"},
+      {id:"f3c2",code:"CIS 3555",title:"AI for Business",cr:3,bk:"found",ic:"i-sparkles",pr:["Programming"],prereqText:"CIS 2300"},
+      {id:"f3c3",code:"—",title:"ADSAI Elective",cr:3,bk:"focus",ic:"i-chart",isPlaceholder:true},
+      {id:"f3c4",code:"—",title:"College Option",cr:3,bk:"college",ic:"i-grad"},
+      getSlot('f3',0) || {id:"f3c5",code:"—",title:"Creative Expression",cr:3,bk:"flex",ic:"i-compass"}
+    ].filter(Boolean)},
+    {year:3,si:5,label:"Spring · Year 3",title:"Advanced AI & Modeling",courses:[
+      {id:"s3c1",code:"OPM 3510",title:"Sequential Decision Analytics",cr:3,bk:"found",ic:"i-network",pr:["Math/Quant"],prereqText:opmPrereq},
+      getSlot('s3',0), getSlot('s3',1),
+      {id:"s3c3",code:"—",title:"The Individual and Society",cr:3,bk:"flex",ic:"i-compass"},
+      {id:"s3c4",code:"—",title:"6th course flexible core elective",cr:3,bk:"flex",ic:"i-compass"},
+      {id:"s3c5",code:"—",title:"College Option",cr:3,bk:"college",ic:"i-grad"}
+    ].filter(Boolean)},
+    {year:4,si:6,label:"Fall · Year 4",title:"Synthesis",courses:[
+      {id:"f4c1",code:"STA 4155/MTH 4130",title:"Regression & Forecasting",cr:3,bk:"found",ic:"i-trend",pr:["STA 3000"],prereqText:"STA 3000"},
+      {id:"f4c2",code:"—",title:"ADSAI Elective",cr:3,bk:"focus",ic:"i-chart",isPlaceholder:true},
+      {id:"f4c3",code:"—",title:"ADSAI Elective",cr:3,bk:"focus",ic:"i-chart",isPlaceholder:true},
+      getSlot('f4',0), getSlot('f4',1), getSlot('f4',2)
+    ].filter(Boolean)},
+    {year:4,si:7,label:"Spring · Year 4",title:"Synthesis & Capstone",courses:[
+      adCap,
+      {id:"s4c2",code:"—",title:"College Option Capstone",cr:3,bk:"college",ic:"i-grad"},
+      {id:"s4c3",code:"—",title:"Free Elective",cr:3,bk:"free",ic:"i-book"},
+      {id:"s4c4",code:"—",title:"Free Elective",cr:4,bk:"free",ic:"i-book"}
+    ]}
+  ];
+}
+
+// Compute which placeholder IDs should be suppressed globally based on placed electives.
+// Two-pass: first prefer same-semester suppression so dropping onto a placeholder
+// removes that placeholder; then fall back to other semesters.
+function getSuppressedPlaceholderIds(){
+  const placements = []; // {si, key, consumed}
+  for(const c of AVAILABLE_ELECTIVES){
+    if(plan[c.id] === undefined || plan[c.id] === -1) continue;
+    const key = (c.isCap ? "cap_" : "") + c.bk;
+    placements.push({si: plan[c.id], key, consumed: false});
+  }
+  const suppressed = new Set();
+
+  // Pass 1: same-semester preference
+  for(const p of placements){
+    const sem = SEMESTERS[p.si];
+    if(!sem) continue;
+    for(const pc of sem.courses){
+      if(!pc.isPlaceholder || suppressed.has(pc.id)) continue;
+      const phKey = (pc.isCap ? "cap_" : "") + pc.bk;
+      if(phKey === p.key){
+        suppressed.add(pc.id);
+        p.consumed = true;
+        break;
+      }
+    }
+  }
+
+  // Pass 2: cross-semester fallback for remaining placements
+  for(const p of placements){
+    if(p.consumed) continue;
+    for(const sem of SEMESTERS){
+      let found = false;
+      for(const pc of sem.courses){
+        if(!pc.isPlaceholder || suppressed.has(pc.id)) continue;
+        const phKey = (pc.isCap ? "cap_" : "") + pc.bk;
+        if(phKey === p.key){
+          suppressed.add(pc.id);
+          p.consumed = true;
+          found = true;
+          break;
+        }
+      }
+      if(found) break;
+    }
+  }
+
+  return suppressed;
+}
+
+function coursesForSem(si){
+  const sem=SEMESTERS[si];
+  const suppressed = getSuppressedPlaceholderIds();
+  const movedIn = [];
+  for(const id in plan){ if(plan[id]===si && origSi(id)!==si){ const c=cById(id); if(c) movedIn.push(c); } }
+
+  // Walk the layout in order. When a same-semester placeholder is suppressed,
+  // insert a matching movedIn course at that position (if any).
+  const used = new Set();
+  const result = [];
+  for(const c of sem.courses){
+    if(c.fys) continue;
+    if(plan[c.id] !== undefined && plan[c.id] !== si) continue;
+    if(c.isPlaceholder && suppressed.has(c.id)){
+      const match = movedIn.find(m => !used.has(m.id) && m.bk === c.bk && !!m.isCap === !!c.isCap);
+      if(match){ result.push(match); used.add(match.id); }
+      continue;
+    }
+    result.push(c);
+  }
+  // Append any remaining movedIn (cross-semester drops without local placeholder)
+  for(const m of movedIn){ if(!used.has(m.id)) result.push(m); }
+  return result;
+}
+
+function gateGPA(){
+  let pts=0,cr=0;
+  GPA_GATE_IDS.forEach(id=>{const c=cById(id),g=getGr(id);if(g&&c){const gv=GRADES.find(x=>x.l===g);if(gv){pts+=gv.g*c.cr;cr+=c.cr}}});
+  return cr>0?pts/cr:null;
+}
+
+function canDrop(c,si){
+  if(si === -1) return {ok: true}; 
+  if(c.fys || c.isPlaceholder) return {ok:false,r:"Cannot move this item"};
+  if (effSi(c.id) === si) return {ok: true}; 
+  
+  // Concentration / focus elective cap: block if all matching placeholders are already filled
+  const isFromBank = AVAILABLE_ELECTIVES.some(e=>e.id===c.id);
+  if(isFromBank){
+    let totalPhs = 0;
+    for(const sem of SEMESTERS){
+      for(const sc of sem.courses){
+        if(sc.isPlaceholder && sc.bk === c.bk && !!sc.isCap === !!c.isCap) totalPhs++;
+      }
+    }
+    let placedExcl = 0;
+    for(const e of AVAILABLE_ELECTIVES){
+      if(e.id === c.id) continue;
+      if(plan[e.id] === undefined || plan[e.id] === -1) continue;
+      if(e.bk === c.bk && !!e.isCap === !!c.isCap) placedExcl++;
+    }
+    if(placedExcl >= totalPhs){
+      const label = c.isCap ? 'capstone' : (c.bk === 'conc' ? 'concentration elective' : 'ADSAI elective');
+      return {ok: false, r: `All ${totalPhs} ${label} slots filled — remove one first`};
+    }
+  }
+  
+  const targetSemCourses = coursesForSem(si);
+  let currentCr = targetSemCourses.reduce((a, b) => a + b.cr, 0);
+  const replacingPh = targetSemCourses.find(tc => tc.isPlaceholder && tc.bk === c.bk && !!tc.isCap === !!c.isCap);
+  if (replacingPh) currentCr -= replacingPh.cr;
+  
+  // Strict 18 Credit Limit Check
+  if(currentCr + c.cr > 18) return {ok: false, r: `Limit is 18 credits (Would be ${currentCr + c.cr})`};
+  
+  // Prerequisite Check
+  if (c.pr) {
+      for (const pQuery of c.pr) {
+          const pCourse = cByCodeQuery(pQuery);
+          if (pCourse) {
+              const pEffSi = effSi(pCourse.id);
+              const pSt = getSt(pCourse.id);
+              if (pSt !== 'completed') {
+                  if (pEffSi === -1 || pEffSi >= si) {
+                      return {ok: false, r: `Requires ${pCourse.code.split('/')[0]} prior`};
+                  }
+              }
+          }
+      }
+  }
+
+  return{ok:true};
+}
+
+function stats(){
+  let done=0,pl=0,ip=0,pts=0,gcr=0; const tot=120;
+  const bk=Object.fromEntries(BUCKETS.map(b=>[b.id,0]));
+  const countCr = (c) => {
+    const st=getSt(c.id);
+    if(st==="completed"){done+=c.cr||0;if(c.bk)bk[c.bk]++;const g=getGr(c.id);if(g){const gv=GRADES.find(x=>x.l===g);if(gv&&c.cr>0){pts+=gv.g*c.cr;gcr+=c.cr}}}
+    else if(st==="in_progress")ip+=c.cr||0; else if(st==="planned")pl+=c.cr||0;
+  };
+  SEMESTERS.forEach(s=>s.courses.forEach(countCr));
+  AVAILABLE_ELECTIVES.forEach(c=>{ if(plan[c.id] !== undefined) countCr(c); });
+  return{done,pl,ip,tot,gpa:gcr>0?pts/gcr:null,gcr,bk,gate:gateGPA()};
+}
+
+function snapRun(si){
+  const c=Object.fromEntries(BUCKETS.map(b=>[b.id,0]));
+  for(let i=0;i<=si;i++) coursesForSem(i).forEach(c2=>{if(c2.bk)c[c2.bk]++}); return c;
+}
+function snapDone(si){
+  const c=Object.fromEntries(BUCKETS.map(b=>[b.id,0]));
+  for(let i=0;i<=si;i++) coursesForSem(i).forEach(c2=>{if(c2.bk&&getSt(c2.id)==="completed")c[c2.bk]++}); return c;
+}
+
+function cap(b,total,pl,done){
+  if(!total) return "";
+  const W=88,H=10,R=5,gap=1.5; const cw=(W-(total-1)*gap)/total;
+  let s=`<svg class="bksvg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="cp${b.id}${total}${done}"><rect x="0" y="0" width="${W}" height="${H}" rx="${R}" ry="${R}"/></clipPath></defs><g clip-path="url(#cp${b.id}${total}${done})"><rect x="0" y="0" width="${W}" height="${H}" fill="rgba(0,0,0,0.06)"/>`;
+  for(let i=0;i<Math.min(pl,total);i++){const x=i*(cw+gap);const cc=(b.id==="conc"&&b.splitAt)?(i<b.splitAt?"var(--c-conc)":"var(--c-celec)"):`var(${b.color})`;s+=`<rect x="${x}" y="0" width="${cw}" height="${H}" fill="${cc}" opacity="0.28"/>`}
+  for(let i=0;i<Math.min(done,total);i++){const x=i*(cw+gap);const cc=(b.id==="conc"&&b.splitAt)?(i<b.splitAt?"var(--c-conc)":"var(--c-celec)"):`var(${b.color})`;s+=`<rect x="${x}" y="0" width="${cw}" height="${H}" fill="${cc}"/>`}
+  for(let i=1;i<total;i++){const px=i*cw+(i-1)*gap+gap/2;s+=`<line x1="${px}" y1="0" x2="${px}" y2="${H}" stroke="white" stroke-width="${gap}"/>`}
+  s+=`</g><rect x=".25" y=".25" width="${W-.5}" height="${H-.5}" rx="${R}" ry="${R}" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width=".5"/></svg>`;
+  return s;
+}
+
+function renderDash(){
+  const st=stats(); const pct=Math.round((st.done/st.tot)*100);
+  const gpaN=st.gpa!==null?st.gpa.toFixed(2):"—"; const gatN=st.gate!==null?st.gate.toFixed(2):"—"; const gateOk=st.gate!==null&&st.gate>=3.0;
+  let concReqDone = 0, concElecDone = 0;
+  SEMESTERS.forEach(s=>s.courses.forEach(c=>{ if(c.bk==='conc' && c.req && getSt(c.id)==='completed') concReqDone++; }));
+  AVAILABLE_ELECTIVES.filter(c=>c.bk==='conc').forEach(c=>{ if(plan[c.id]!==undefined && getSt(c.id)==='completed') { if (c.isCap || c.req) concReqDone++; else concElecDone++; } });
+  
+  const cData = CONC_DATA[activeConc];
+  const reqTotal = cData.req_count; const elecTotal = cData.elec_count + cData.cap_count;
+
+  document.getElementById("dashboard").innerHTML=`
+    <div class="stat-card" style="--sc:var(--success)"><div class="stat-lbl">Credits Done</div><div class="stat-val">${st.done}<span class="u">/${st.tot}</span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct}%"></div></div><div class="stat-sub">${pct}% · ${st.ip+st.pl} cr planned/in-progress</div></div>
+    <div class="stat-card" style="--sc:${gateOk?"var(--success)":"var(--warn)"}"><div class="stat-lbl">Pre-BS GPA</div><div class="stat-val">${gatN}<span class="u">/3.0</span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${gatN!=="—"?Math.min(100,(parseFloat(gatN)/3)*100):0}%"></div></div><div class="stat-sub">${gateOk?"✓ Major entry unlocked":"Calc I + Programming + CIS 3400"}</div></div>
+    <div class="stat-card" style="--sc:var(--c-req)"><div class="stat-lbl">Overall GPA</div><div class="stat-val">${gpaN}<span class="u">/4.0</span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${st.gpa?Math.min(100,(st.gpa/4)*100):0}%"></div></div><div class="stat-sub">${st.gcr} graded credits</div></div>
+    <div class="stat-card" style="--sc:var(--c-conc)"><div class="stat-lbl">Concentration</div><div class="stat-val">${concReqDone + concElecDone}<span class="u">/${reqTotal + elecTotal}</span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${Math.round(((concReqDone + concElecDone)/(reqTotal+elecTotal))*100)}%"></div></div><div class="stat-sub">Req: ${concReqDone}/${reqTotal} · Elec: ${concElecDone}/${elecTotal}</div></div>
+  `;
+}
+
+function renderLegend(){
+  document.getElementById("legend").innerHTML=`<span class="legend-title">10 Pillars</span>` + BUCKETS.map(b=>{
+    if(b.id==="conc")return`<span class="li"><span class="ld" style="background:linear-gradient(90deg,var(--c-conc) 50%,var(--c-celec) 50%);border-radius:2px"></span>Concentration</span>`;
+    return`<span class="li"><span class="ld" style="background:var(${b.color})"></span>${b.name}</span>`;
+  }).join("");
+}
+
+function buildSidebarCourse(c) {
+    return`<li class="sidebar-course" data-id="${c.id}" draggable="true">
+        <svg class="grip" viewBox="0 0 24 24"><use href="#i-grip"/></svg>
+        <div style="flex:1; min-width:0;">
+            <span class="ccode">${c.code}</span>
+            <span class="ctitle" title="${c.title}">${c.title}</span>
+        </div>
+    </li>`;
+}
+
+function renderSidebarBanks() {
+    document.getElementById("adsai-bank").innerHTML = AVAILABLE_ELECTIVES.filter(c => c.bk==='focus' && plan[c.id] === undefined).map(buildSidebarCourse).join('');
+    document.getElementById("conc-bank").innerHTML = AVAILABLE_ELECTIVES.filter(c => c.bk==='conc' && !c.isCap && plan[c.id] === undefined).map(buildSidebarCourse).join('');
+    document.getElementById("cap-bank").innerHTML = AVAILABLE_ELECTIVES.filter(c => c.isCap && plan[c.id] === undefined).map(buildSidebarCourse).join('');
+}
+
+function buildCourse(c){
+  const st=getSt(c.id),gr=getGr(c.id);
+  const moved=(plan[c.id]!==undefined&&plan[c.id]!==origSi(c.id));
+  const fysC=c.fys?" fys":"",movC=moved?" moved":"", phC=c.isPlaceholder?" placeholder":"";
+  const isPlacedElec = !c.isPlaceholder && !c.fys && AVAILABLE_ELECTIVES.some(e=>e.id===c.id);
+  const removeBtn = isPlacedElec ? `<button class="course-remove" data-remove="${c.id}" title="Remove elective">✕</button>` : '';
+  return`<li class="course${fysC}${movC}${phC} st-${st}" data-id="${c.id}" draggable="${(c.fys||c.isPlaceholder)?'false':'true'}">
+    ${c.isPlaceholder?'<div style="width:11px;flex-shrink:0"></div>':`<svg class="grip" viewBox="0 0 24 24"><use href="#i-grip"/></svg>`}
+    <svg class="cicon" viewBox="0 0 24 24" style="${c.isPlaceholder?'opacity:0.5':''}"><use href="#${c.ic}"/></svg>
+    <span class="ctext"><span class="ccode">${c.code}</span><span class="ctitle">${c.title}</span></span>
+    <span style="display:flex;align-items:center;gap:3px">${gr?`<span class="grade-chip">${gr}</span>`:""}${c.cr>0?`<span class="cr-chip">(${c.cr})</span>`:""}</span>
+    ${removeBtn}
+  </li>`;
+}
+
+function renderGrid(){
+  const grid=document.getElementById("grid"); grid.innerHTML="";
+  const isBlocked = gateGPA() !== null && gateGPA() < 3.0;
+  SEMESTERS.forEach((sem,idx)=>{
+    const el=document.createElement("section");
+    el.className="sem" + ((isBlocked && idx >= 2) ? " disabled" : ""); el.dataset.si=idx;
+    
+    const cs=coursesForSem(idx); const fys=sem.courses.filter(c=>c.fys);
+    let done=0,cr=0,crdone=0; cs.forEach(c=>{cr+=c.cr;if(getSt(c.id)==="completed"){done++;crdone+=c.cr}});
+    if(done>0)el.classList.add("done");
+    
+    const run=snapRun(idx),dn=snapDone(idx);
+    const gsHTML=GROUPS.map(g=>{
+      const bs=BUCKETS.filter(b=>b.group===g.id);
+      return`<div><div class="bkglbl">${g.label}</div><div class="bkrows">${bs.map(b=>`<div class="bkrow"><span class="bkname">${b.name}</span>${cap(b,b.total,Math.min(b.total,run[b.id]||0),Math.min(b.total,dn[b.id]||0))}<span class="bkct">${dn[b.id]||0}/${b.total}</span></div>`).join("")}</div></div>`;
+    }).join("");
+    
+    const semNote = idx===0 ? `<div class="sem-note">⚠ <strong>Pre-BS GPA Gate:</strong> Calc I, Programming, and CIS 3400 (Spring) must average ≥ 3.0 to enter the major.</div>` : '';
+    el.innerHTML=`
+      <div class="lcol">
+        <div class="sem-head"><span class="sem-lbl">${sem.label}<span class="sem-cr${cr>18?" overload":""}">${done>0?`<strong>${crdone}</strong>/${cr} cr`:`${cr} cr`}</span></span><span class="sem-title">${sem.title}</span></div>
+        <ul class="courses" data-si="${idx}">${[...cs.map(buildCourse),...fys.map(buildCourse)].join("")}</ul>
+        ${semNote}
+      </div>
+      <div class="rcol"><div class="bktitle">Progress through 10 pillars</div><div class="bkgroups">${gsHTML}</div></div>
+    `;
+    grid.appendChild(el);
+  });
+  wireEvents(); wireDrag();
+}
+
+// Drag & Drop & Tooltip Logic
+const tt=document.getElementById("tooltip"); let ttT=null;
+function showTT(target,html){clearTimeout(ttT);tt.innerHTML=html;const r=target.getBoundingClientRect();tt.style.left=Math.min(window.innerWidth-280,r.left)+"px";tt.style.top=(r.bottom+6)+"px";tt.classList.add("vis")}
+function hideTT(){ttT=setTimeout(()=>tt.classList.remove("vis"),100)}
+function buildTT(c){
+  const bk=BUCKETS.find(b=>b.id===c.bk); const st=STATUSES.find(s=>s.id===getSt(c.id))?.label||"Not yet"; const gr=getGr(c.id);
+  const mv=plan[c.id]!==undefined&&plan[c.id]!==origSi(c.id);
+  let rows="";
+  if(bk) rows+=`<div class="tt-row"><span class="tt-key">Pillar</span><span class="tt-val">${bk.name}</span></div>`;
+  if(c.cr>0) rows+=`<div class="tt-row"><span class="tt-key">Credits</span><span class="tt-val">${c.cr}</span></div>`;
+  if(c.prereqText) rows+=`<div class="tt-row"><span class="tt-key" style="color:var(--warn)">Prereq</span><span class="tt-val">${c.prereqText}</span></div>`;
+  if(c.dual) rows+=`<div class="tt-row"><span class="tt-key">Note</span><span class="tt-val">Dual-purpose: Pathways + concentration</span></div>`;
+  if(c.flag==="*") rows+=`<div class="tt-row"><span class="tt-key">⚠ GPA</span><span class="tt-val">Counts toward Pre-BS GPA gate</span></div>`;
+  if(c.isPlaceholder) rows+=`<div class="tt-row"><span class="tt-key">Note</span><span class="tt-val">Drag elective from sidebar to fill</span></div>`;
+  if(mv) rows+=`<div class="tt-row"><span class="tt-key">Moved</span><span class="tt-val">From ${origSi(c.id)===-1?"Sidebar Bank":SEMESTERS[origSi(c.id)].label}</span></div>`;
+  if(!c.isPlaceholder) rows+=`<div class="tt-row"><span class="tt-key">Status</span><span class="tt-val">${st}${gr?` · ${gr}`:""}</span></div>`;
+  return`<strong>${c.code} · ${c.title}</strong>${rows}<div class="tt-hint">${c.isPlaceholder?"":"Drag to reschedule · Click for grade/status"}</div>`;
+}
+
+function wireEvents(){
+  document.querySelectorAll(".course, .sidebar-course").forEach(li=>{
+    if(li.classList.contains("course")) li.addEventListener("click",()=>openEd(li.dataset.id));
+    li.addEventListener("mouseenter",()=>{const c=cById(li.dataset.id);if(c)showTT(li,buildTT(c))});
+    li.addEventListener("mouseleave",hideTT);
+  });
+  document.querySelectorAll(".course-remove").forEach(btn=>{
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const id=btn.dataset.remove;
+      delete plan[id]; delete state[id];
+      renderAll(); toast(`Removed — returned to bank`);
+    });
+  });
+}
+
+let dragId=null,dragSi=null,ph=null;
+function wireDrag(){
+  document.querySelectorAll(".course[draggable='true'], .sidebar-course[draggable='true']").forEach(el=>{
+    el.addEventListener("dragstart",e=>{
+      dragId=e.currentTarget.dataset.id; dragSi = e.currentTarget.closest(".courses") ? parseInt(e.currentTarget.closest(".courses").dataset.si) : -1;
+      e.currentTarget.classList.add("dragging"); hideTT();
+    });
+    el.addEventListener("dragend",e=>{ e.currentTarget.classList.remove("dragging"); rmPH();dragId=null;dragSi=null; });
+  });
+  document.querySelectorAll(".courses[data-si]").forEach(ul=>{
+    ul.addEventListener("dragover",e=>{ e.preventDefault();if(!dragId)return;
+      const si=parseInt(ul.dataset.si), c=cById(dragId);if(!c)return; const chk=canDrop(c,si);
+      if(si !== -1) { rmPH();ph=document.createElement("li");ph.className="drop-ph"+(chk.ok?"":" no");ph.textContent=chk.ok?"Drop here":`✗ ${chk.r}`;ul.appendChild(ph); }
+    });
+    ul.addEventListener("dragleave",e=>{ if(!ul.contains(e.relatedTarget)) rmPH(); });
+    ul.addEventListener("drop",e=>{
+      e.preventDefault(); const si=parseInt(ul.dataset.si); rmPH(); if(!dragId)return;
+      const c=cById(dragId);if(!c||si===dragSi)return; const chk=canDrop(c,si);
+      if(!chk.ok){toast(`✗ ${chk.r}`,"err");return}
+      if(si === -1) delete plan[dragId]; else plan[dragId]=si;
+      renderAll(); toast(si !== -1 ? `Moved ${c.code}` : `Returned ${c.code} to Bank`);
+    });
+  });
+}
+function rmPH(){if(ph&&ph.parentNode)ph.parentNode.removeChild(ph);ph=null}
+
+function openEd(id){
+  const c=cById(id); if(!c||c.fys||c.isPlaceholder) return;
+  const st=getSt(id),gr=getGr(id);
+  document.getElementById("ed").innerHTML=`
+    <h3>${c.code}</h3><div class="editor-meta">${c.title} · ${c.cr} cr</div>
+    <div class="ed-sec"><div class="ed-sec-lbl">Status</div><div class="status-opts">${STATUSES.map(s=>`<button class="sopt${st===s.id?" active":""}" data-s="${s.id}">${s.label}</button>`).join("")}</div></div>
+    <div class="ed-sec" style="${st==="completed"?"":"opacity:.4;pointer-events:none"}"><div class="ed-sec-lbl">Grade</div><div class="grade-grid">${GRADES.map(g=>`<button class="gopt${gr===g.l?" active":""}" data-g="${g.l}">${g.l}</button>`).join("")}<button class="gopt" data-g="">—</button></div></div>
+    <div class="ed-actions"><button class="btn primary" id="btn-done">Close</button></div>
+  `;
+  document.getElementById("eo").classList.add("vis");
+  document.querySelectorAll(".sopt").forEach(b=>b.addEventListener("click",()=>{setSt(id,b.dataset.s);openEd(id);renderAll()}));
+  document.querySelectorAll(".gopt").forEach(b=>b.addEventListener("click",()=>{setGr(id,b.dataset.g||null);openEd(id);renderAll()}));
+  document.getElementById("btn-done").addEventListener("click",()=>document.getElementById("eo").classList.remove("vis"));
+}
+
+document.getElementById("conc-select").addEventListener("change", (e) => {
+  if(confirm("Changing concentration will clear any specific domain electives mapped. Continue?")) {
+      plan = {}; // Clear drag/drop state to prevent orphaned electives
+      buildModel(e.target.value);
+      renderAll();
+      toast(`Switched to ${CONC_DATA[e.target.value].name}`);
+  } else {
+      e.target.value = activeConc;
+  }
+});
+
+const toastEl=document.getElementById("toast");
+function toast(msg,type=""){toastEl.textContent=msg;toastEl.className="toast vis"+(type?" "+type:"");clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.classList.remove("vis"),2800)}
+
+document.getElementById("btn-reset").addEventListener("click",()=>{ if(confirm("Reset all progress?")){state={};plan={};renderAll();toast("Reset complete")} });
+
+function renderAll(){renderSidebarBanks();renderDash();renderGrid()}
+
+// Initialize
+buildModel("cognitive_neuroscience");
+renderLegend();
+renderAll();
+</script>
+</body>
+</html>

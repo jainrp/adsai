@@ -279,10 +279,10 @@ const CONC_DATA = {
       {id:"bp_e4", code:"PSY 3069", title:"Psychology of Law", cr:3, ic:"i-scale", pr:["PSY 1001"], prereqText:"PSY 1001"}
     ],
     cap: [
-      {id:"bp_cp1", code:"PSY 4013", title:"Advanced Personnel Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
-      {id:"bp_cp2", code:"PSY 4181", title:"Advanced Organizational Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
-      {id:"bp_cp3", code:"PSY 4182", title:"Occupational Health Psychology", cr:3, ic:"i-target", prereqText:"Check Dept Details"},
-      {id:"bp_cp4", code:"PSY 4183", title:"Psych of Career Development", cr:3, ic:"i-target", prereqText:"Check Dept Details"}
+      {id:"bp_cp1", code:"PSY 4013", title:"Advanced Personnel Psychology", cr:3, ic:"i-target", pr:["PSY 3001"], prereqText:"PSY 3001"},
+      {id:"bp_cp2", code:"PSY 4181", title:"Advanced Organizational Psychology", cr:3, ic:"i-target", pr:["PSY 3181"], prereqText:"PSY 3181"},
+      {id:"bp_cp3", code:"PSY 4182", title:"Occupational Health Psychology", cr:3, ic:"i-target", pr:["PSY 1001"], prereqText:"PSY 1001"},
+      {id:"bp_cp4", code:"PSY 4183", title:"Psych of Career Development", cr:3, ic:"i-target", pr:["PSY 1001"], prereqText:"PSY 1001"}
     ],
     layout: { f2: ["bp_c1"], s2: ["bp_c2", "bp_c3"] }
   },
@@ -299,9 +299,9 @@ const CONC_DATA = {
       {id:"cn_e3", code:"PSY 3185", title:"Environmental Psychology", cr:3, ic:"i-brain", pr:["PSY 1001"], prereqText:"PSY 1001"}
     ],
     cap: [
-      {id:"cn_cp1", code:"PSY 4080", title:"Sensation and Perception", cr:3, ic:"i-eye", prereqText:"PSY 3081 or PSY 3082"},
-      {id:"cn_cp2", code:"PSY 3040m", title:"Spec Topics: Memory & Attention", cr:3, ic:"i-brain", prereqText:"PSY 3081 or PSY 3082"},
-      {id:"cn_cp3", code:"PSY 3040d", title:"Spec Topics: Decision Making", cr:3, ic:"i-brain", prereqText:"PSY 3081 or PSY 3082"}
+      {id:"cn_cp1", code:"PSY 4080", title:"Sensation and Perception", cr:3, ic:"i-eye", pr:["PSY 3081"], prereqText:"PSY 3081 or PSY 3082"},
+      {id:"cn_cp2", code:"PSY 3040m", title:"Spec Topics: Memory & Attention", cr:3, ic:"i-brain", pr:["PSY 3081"], prereqText:"PSY 3081 or PSY 3082"},
+      {id:"cn_cp3", code:"PSY 3040d", title:"Spec Topics: Decision Making", cr:3, ic:"i-brain", pr:["PSY 3081"], prereqText:"PSY 3081 or PSY 3082"}
     ],
     layout: { f2: ["cn_c1"], s2: ["cn_c2", "cn_c3"] }
   },
@@ -332,16 +332,16 @@ const CONC_DATA = {
       {id:"en_c3", code:"ENT 3960", title:"Pre-Launch Journey", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"}
     ],
     elec: [
-      {id:"en_e1", code:"ENT 3962", title:"Family Enterprise Dynamics", cr:3, ic:"i-sparkles"},
-      {id:"en_e2", code:"ENT 3963", title:"Forecasting and Futuring", cr:3, ic:"i-trend"},
-      {id:"en_e3", code:"ENT 3968", title:"The Art of Persuasion", cr:3, ic:"i-mic"},
-      {id:"en_e4", code:"ENT 3971", title:"Multicultural Ent Experiences", cr:3, ic:"i-sparkles"},
-      {id:"en_e5", code:"ENT 3993", title:"Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles"},
-      {id:"en_e6", code:"ENT 4954", title:"New Venture Funding", cr:3, ic:"i-chart"},
-      {id:"en_e7", code:"ENT 4960", title:"New Venture Management", cr:3, ic:"i-sparkles"},
-      {id:"en_e8", code:"ENT 4967", title:"Tech & Innovation in Ent", cr:3, ic:"i-code"},
-      {id:"en_e9", code:"ENT 4969", title:"Social Entrepreneurship", cr:3, ic:"i-scale"},
-      {id:"en_e10", code:"ENT 4993", title:"Adv Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles"}
+      {id:"en_e1", code:"ENT 3962", title:"Family Enterprise Dynamics", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e2", code:"ENT 3963", title:"Forecasting and Futuring", cr:3, ic:"i-trend", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e3", code:"ENT 3968", title:"The Art of Persuasion", cr:3, ic:"i-mic", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e4", code:"ENT 3971", title:"Multicultural Ent Experiences", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e5", code:"ENT 3993", title:"Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e6", code:"ENT 4954", title:"New Venture Funding", cr:3, ic:"i-chart", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e7", code:"ENT 4960", title:"New Venture Management", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e8", code:"ENT 4967", title:"Tech & Innovation in Ent", cr:3, ic:"i-code", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e9", code:"ENT 4969", title:"Social Entrepreneurship", cr:3, ic:"i-scale", pr:["ENT 3950"], prereqText:"ENT 3950"},
+      {id:"en_e10", code:"ENT 4993", title:"Adv Spec Topics in Ent & Innov", cr:3, ic:"i-sparkles", pr:["ENT 3950"], prereqText:"ENT 3950"}
     ],
     cap: [],
     layout: { f2: ["en_c1"], s2: ["en_c2", "en_c3"] }
@@ -349,13 +349,13 @@ const CONC_DATA = {
   journalism: {
     name: "Journalism", shortName: "JRN", cr: 19, req_count: 3, elec_count: 3, cap_count: 0, fn: "Recommends 1000-level HIS in Pathways.",
     req: [
-      {id:"jr_c1", code:"JRN 2500", title:"The Individual and the News", cr:3, ic:"i-write", prereqText:"ENG 2100"},
-      {id:"jr_c2", code:"JRN 3050/3200", title:"Reporting / Fin Journalism", cr:4, ic:"i-write", prereqText:"ENG 2150"},
-      {id:"jr_c3", code:"JRN 3220", title:"Media Ethics and Law", cr:3, ic:"i-scale", prereqText:"ENG 2150"}
+      {id:"jr_c1", code:"JRN 2500", title:"The Individual and the News", cr:3, ic:"i-write", pr:["ENG 2100"], prereqText:"ENG 2100"},
+      {id:"jr_c2", code:"JRN 3050/3200", title:"Reporting / Fin Journalism", cr:4, ic:"i-write", pr:["ENG 2150"], prereqText:"ENG 2150"},
+      {id:"jr_c3", code:"JRN 3220", title:"Media Ethics and Law", cr:3, ic:"i-scale", pr:["ENG 2150"], prereqText:"ENG 2150"}
     ],
     elec: [
-      {id:"jr_e1", code:"JRN 3201/2", title:"Covering Markets/Wealth", cr:3, ic:"i-write", prereqText:"ENG 2150"},
-      {id:"jr_e2", code:"JRN 3510/30", title:"Multimedia/Podcasting", cr:3, ic:"i-mic", prereqText:"Check Dept Details"},
+      {id:"jr_e1", code:"JRN 3201/2", title:"Covering Markets/Wealth", cr:3, ic:"i-write", pr:["ENG 2150"], prereqText:"ENG 2150"},
+      {id:"jr_e2", code:"JRN 3510/30", title:"Multimedia/Podcasting", cr:3, ic:"i-mic", pr:["JRN 2500"], prereqText:"JRN 2500"},
       {id:"jr_e3", code:"HIS 3053", title:"American History 1945+", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
       {id:"jr_e4", code:"HIS 3074", title:"Econ History of Latin America", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
       {id:"jr_e5", code:"HIS 3410", title:"Hist of American Business", cr:3, ic:"i-book", prereqText:"One 1000-level History course"},
@@ -374,12 +374,12 @@ const CONC_DATA = {
       {id:"mk_c3", code:"MKT 3620", title:"Digital Transformation of Mkt", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"}
     ],
     elec: [
-      {id:"mk_e1", code:"MKT 4123", title:"Mkt Web Analytics", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
-      {id:"mk_e2", code:"MKT 4555", title:"Advanced Digital Marketing", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
-      {id:"mk_e3", code:"MKT 4557", title:"Digital Advertising", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
-      {id:"mk_e4", code:"MKT 4561", title:"Marketing Analytics", cr:3, ic:"i-chart", prereqText:"Check Dept Details"},
-      {id:"mk_e5", code:"MKT 4620", title:"Text Analytics for Mkt", cr:3, ic:"i-write", prereqText:"Check Dept Details"},
-      {id:"mk_e6", code:"MKT 4630", title:"Mkt Analytics with Big Data", cr:3, ic:"i-db", prereqText:"Check Dept Details"}
+      {id:"mk_e1", code:"MKT 4123", title:"Mkt Web Analytics", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"},
+      {id:"mk_e2", code:"MKT 4555", title:"Advanced Digital Marketing", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"},
+      {id:"mk_e3", code:"MKT 4557", title:"Digital Advertising", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"},
+      {id:"mk_e4", code:"MKT 4561", title:"Marketing Analytics", cr:3, ic:"i-chart", pr:["MKT 3000"], prereqText:"MKT 3000"},
+      {id:"mk_e5", code:"MKT 4620", title:"Text Analytics for Mkt", cr:3, ic:"i-write", pr:["MKT 3000"], prereqText:"MKT 3000"},
+      {id:"mk_e6", code:"MKT 4630", title:"Mkt Analytics with Big Data", cr:3, ic:"i-db", pr:["MKT 3000"], prereqText:"MKT 3000"}
     ],
     cap: [],
     layout: { f2: ["mk_c1"], s2: ["mk_c2", "mk_c3"] }
@@ -393,10 +393,10 @@ const CONC_DATA = {
       {id:"op_c4", code:"OPM 4550", title:"Adv Managerial Decision Mkg", cr:3, ic:"i-target", pr:["OPM 3000"], prereqText:"OPM 3000 & (STA 3000 or 3154)"}
     ],
     elec: [
-      {id:"op_e1", code:"OPM 3710", title:"Supply Chain Management", cr:3, ic:"i-network"},
-      {id:"op_e2", code:"OPM 3740", title:"Project Management", cr:3, ic:"i-target"},
-      {id:"op_e3", code:"OPM 4500", title:"Cases in Operations Mgmt", cr:3, ic:"i-book"},
-      {id:"op_e4", code:"OPM 4551", title:"Operations Mgmt Consulting", cr:3, ic:"i-mic"}
+      {id:"op_e1", code:"OPM 3710", title:"Supply Chain Management", cr:3, ic:"i-network", pr:["OPM 3000"], prereqText:"OPM 3000"},
+      {id:"op_e2", code:"OPM 3740", title:"Project Management", cr:3, ic:"i-target", pr:["OPM 3000"], prereqText:"OPM 3000"},
+      {id:"op_e3", code:"OPM 4500", title:"Cases in Operations Mgmt", cr:3, ic:"i-book", pr:["OPM 3000"], prereqText:"OPM 3000"},
+      {id:"op_e4", code:"OPM 4551", title:"Operations Mgmt Consulting", cr:3, ic:"i-mic", pr:["OPM 3000"], prereqText:"OPM 3000"}
     ],
     cap: [],
     layout: { f2: ["op_c1"], s2: ["op_c2", "op_c3"], s3: ["op_c4"] }
@@ -404,10 +404,10 @@ const CONC_DATA = {
   public_policy: {
     name: "Public Policy", shortName: "Pub Pol", cr: 21, req_count: 4, elec_count: 3, cap_count: 0, fn: "No specific Pathways requirements.",
     req: [
-      {id:"pp_c1", code:"PAF 3010", title:"Race, Inequality & Pub Policy", cr:3, ic:"i-scale", prereqText:"ENG 2100"},
-      {id:"pp_c2", code:"PAF 3015", title:"Qualitative Studies", cr:3, ic:"i-write", prereqText:"ENG 2100"},
-      {id:"pp_c3", code:"PAF 3102", title:"Economic Analysis of Policy", cr:3, ic:"i-chart", prereqText:"ENG 2150 & ECO 1001"},
-      {id:"pp_c4", code:"PAF 3108", title:"Strategic Comm Public Causes", cr:3, ic:"i-mic", prereqText:"ENG 2100"}
+      {id:"pp_c1", code:"PAF 3010", title:"Race, Inequality & Pub Policy", cr:3, ic:"i-scale", pr:["ENG 2100"], prereqText:"ENG 2100"},
+      {id:"pp_c2", code:"PAF 3015", title:"Qualitative Studies", cr:3, ic:"i-write", pr:["ENG 2100"], prereqText:"ENG 2100"},
+      {id:"pp_c3", code:"PAF 3102", title:"Economic Analysis of Policy", cr:3, ic:"i-chart", pr:["ENG 2150"], prereqText:"ENG 2150 & ECO 1001"},
+      {id:"pp_c4", code:"PAF 3108", title:"Strategic Comm Public Causes", cr:3, ic:"i-mic", pr:["ENG 2100"], prereqText:"ENG 2100"}
     ],
     elec: [
       {id:"pp_e1", code:"PAF 3006", title:"Public Service", cr:3, ic:"i-book"},

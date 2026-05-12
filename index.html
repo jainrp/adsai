@@ -158,6 +158,109 @@ h1{font-size:22px;font-weight:600;line-height:1.2}
 .toast.vis{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.warn{background:var(--warn)}
 .toast.err{background:var(--danger)}
+
+@media print {
+  @page { size: letter landscape; margin: 0.25in 0.3in; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { background: #fff !important; }
+  body { font-family: "Geist", system-ui, -apple-system, sans-serif; font-size: 7pt; color: #1a1a1a; }
+
+  /* Hide all interactive chrome */
+  .sidebar, .toast, .tooltip, .editor-overlay, #eo, .tool-btn,
+  .course-remove, .grip, .course .grip, .sem-note,
+  .drop-ph, .course.dragging,
+  .footnotes > div:last-child { display: none !important; }
+
+  /* Layout — single page flow */
+  .wrap { display: block !important; }
+  .main { display: flex !important; flex-direction: column; gap: 3pt; padding: 0; height: auto; overflow: visible; }
+
+  /* Header */
+  .page-header { display: flex !important; justify-content: space-between; align-items: flex-end;
+    border-bottom: 0.5pt solid #333; padding-bottom: 2pt; margin-bottom: 0; }
+  .eyebrow { font-size: 6pt; letter-spacing: 0.14em; color: #6b7280; margin-bottom: 0; }
+  .page-header h1 { font-size: 12pt; font-weight: 600; line-height: 1.1; }
+  .conc-lbl { font-size: 10.5pt; font-style: italic; color: #6366f1; font-weight: 400; }
+  .hdr-meta { font-size: 6.5pt; color: #6b7280; line-height: 1.35; text-align: right; }
+  .hdr-meta strong { font-weight: 600; color: #1a1a1a; font-size: 7.5pt; }
+
+  /* Dashboard — 4 stat cards in a strip */
+  .dashboard { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 4pt; }
+  .stat-card { background: #fff; border: 0.5pt solid #d1d5db; border-radius: 2pt;
+    padding: 3pt 5pt; border-top: 1.5pt solid var(--sc, #2D5F3F); }
+  .stat-lbl { font-size: 5.5pt; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6b7280; margin-bottom: 0; }
+  .stat-val { font-size: 11pt; font-weight: 600; line-height: 1; }
+  .stat-val .u { font-size: 7pt; color: #6b7280; font-weight: 400; }
+  .stat-bar { height: 1.5pt; background: #e5e7eb; border-radius: 1pt; margin: 1.5pt 0 1pt; overflow: hidden; }
+  .stat-bar-fill { height: 100%; background: var(--sc, #2D5F3F); }
+  .stat-sub { font-size: 5.5pt; color: #6b7280; line-height: 1.2; }
+
+  /* Legend — single row, compact */
+  .legend { display: flex !important; flex-wrap: wrap; gap: 2pt 7pt; padding: 2pt 5pt;
+    background: #f9fafb; border: 0.5pt solid #e5e7eb; border-radius: 2pt; font-size: 6pt; }
+  .legend-title { font-size: 5.5pt; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6b7280; margin-right: 2pt; }
+  .li { display: inline-flex; align-items: center; gap: 2pt; color: #4b5563; }
+  .ld { width: 5pt; height: 5pt; border-radius: 50%; flex-shrink: 0; }
+
+  /* Grid — 4 rows x 2 cols of semester panels */
+  .grid { display: grid !important; grid-template-columns: 1fr 1fr; gap: 3pt 5pt; }
+  .sem { background: #fff !important; border: 0.5pt solid #d1d5db; border-radius: 2pt;
+    padding: 3pt 5pt; display: grid !important; grid-template-columns: 1.15fr 0.85fr;
+    gap: 0 5pt; page-break-inside: avoid; opacity: 1 !important; filter: none !important; }
+  .sem::before { width: 1.5pt; }
+  .sem.disabled { opacity: 0.5 !important; }
+
+  .lcol { padding: 0; }
+  .rcol { padding-left: 5pt; border-left: 0.5pt solid #e5e7eb; }
+
+  .sem-head { display: flex !important; align-items: baseline; justify-content: space-between;
+    border-bottom: 0.5pt solid #e5e7eb; padding-bottom: 1pt; margin: 0 0 2pt 0; background: transparent; }
+  .sem-lbl { font-size: 7.5pt; font-weight: 600; color: #1a1a1a; background: transparent; padding: 0; display: inline; }
+  .sem-title { font-size: 5.5pt; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #6b7280; background: transparent; padding: 0; display: inline; }
+  .sem-cr { font-size: 6pt; font-family: monospace; color: #6b7280; margin-left: 3pt; }
+  .sem-cr strong { color: #166534; }
+
+  /* Course list */
+  .courses { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5pt; min-height: 0; }
+  .course { display: flex !important; align-items: center; gap: 2pt; padding: 0.5pt 2pt;
+    border-radius: 1.5pt; background: transparent !important; border: none !important;
+    box-shadow: none !important; cursor: default; }
+  .course::before { content: none !important; }
+  .course.st-completed { background: rgba(22, 101, 52, 0.06) !important; }
+  .course .cicon { width: 7pt; height: 7pt; flex-shrink: 0; color: #6b7280; }
+  .course .ctext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .ccode { font-family: monospace; font-size: 6.5pt; font-weight: 700; color: #1a1a1a; line-height: 1.1; display: block; }
+  .ccode::after { content: none !important; }
+  .ctitle { font-size: 5.5pt; font-weight: 500; color: #4b5563; line-height: 1.15; display: block;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cr-chip { font-family: monospace; font-size: 5.5pt; color: #6b7280; }
+  .grade-chip { font-family: monospace; font-size: 5.5pt; padding: 0.25pt 1.5pt; border-radius: 1.5pt;
+    background: #dcfce7; color: #166534; font-weight: 600; }
+  .flag { font-size: 5.5pt; color: #B45309; font-weight: 700; }
+  .course.placeholder { opacity: 0.55; }
+  .course.placeholder .ctitle { font-style: italic; }
+
+  /* Per-semester pillar progress — the neuroplanner main visual */
+  .rcol .bktitle { font-size: 5pt; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #6b7280; margin-bottom: 1.5pt; }
+  .bkgroups { display: flex; flex-direction: column; gap: 1.5pt; }
+  .bkglbl { font-size: 5pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: #9ca3af; margin-bottom: 0.5pt; }
+  .bkrows { display: flex; flex-direction: column; gap: 0.5pt; }
+  .bkrow { display: flex !important; align-items: center; gap: 2pt; }
+  .bkname { font-size: 5.5pt; color: #4b5563; width: 48pt; flex-shrink: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; }
+  .bksvg { width: 55pt; height: 5pt; display: block; flex-shrink: 0; }
+  .bkct { font-family: monospace; font-size: 5pt; color: #6b7280; width: 14pt; text-align: right; }
+
+  /* Footnotes */
+  .footnotes { display: grid !important; grid-template-columns: 1fr 1fr; gap: 2pt 12pt;
+    padding: 3pt 6pt; background: #f9fafb; border: 0.5pt solid #e5e7eb; border-radius: 2pt;
+    font-size: 5.5pt; line-height: 1.3; color: #4b5563; }
+  .footnotes strong { display: block; color: #1a1a1a; font-weight: 600; font-size: 6pt; margin-bottom: 0.5pt; }
+  .fn-mark { color: #6366f1; font-weight: 700; }
+}
 </style>
 </head>
 <body>
@@ -197,6 +300,7 @@ h1{font-size:22px;font-weight:600;line-height:1.2}
 
   <div class="toolbar">
     <button class="tool-btn" id="btn-share">↑ Share plan</button>
+    <button class="tool-btn" id="btn-pdf">🖨 Print / Save PDF</button>
     <button class="tool-btn" id="btn-reset">↺ Reset plan</button>
   </div>
 </aside>
@@ -948,12 +1052,51 @@ function toast(msg,type=""){toastEl.textContent=msg;toastEl.className="toast vis
 
 document.getElementById("btn-reset").addEventListener("click",()=>{ if(confirm("Reset all progress?")){state={};plan={};renderAll();toast("Reset complete")} });
 
+document.getElementById("btn-share").addEventListener("click", () => {
+  const data = { conc: activeConc, plan, state };
+  const encoded = btoa(JSON.stringify(data));
+  const base = window.location.href.split('#')[0];
+  const url = base + '#' + encoded;
+  navigator.clipboard.writeText(url).then(() => {
+    toast("✓ Shareable link copied to clipboard", "success");
+  }).catch(() => {
+    prompt("Copy this link to share your plan:", url);
+  });
+});
+
+document.getElementById("btn-pdf").addEventListener("click", () => {
+  window.print();
+});
+
+// Load plan from URL hash on page load
+function loadFromHash() {
+  if (!window.location.hash) return;
+  try {
+    const encoded = window.location.hash.slice(1);
+    const data = JSON.parse(atob(encoded));
+    if (data.conc && CONC_DATA[data.conc]) {
+      activeConc = data.conc;
+      document.getElementById("conc-select").value = activeConc;
+    }
+    if (data.plan) plan = data.plan;
+    if (data.state) state = data.state;
+    buildModel(activeConc);
+    renderAll();
+    toast("Plan loaded from shared link");
+  } catch (e) {
+    console.error("Failed to load plan from URL:", e);
+  }
+}
+
 function renderAll(){renderSidebarBanks();renderDash();renderGrid()}
 
 // Initialize
-buildModel("cognitive_neuroscience");
+loadFromHash();
+if (!window.location.hash) {
+  buildModel("cognitive_neuroscience");
+  renderAll();
+}
 renderLegend();
-renderAll();
 </script>
 </body>
 </html>

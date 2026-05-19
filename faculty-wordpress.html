@@ -1,0 +1,617 @@
+<!--
+  BS ADSAI Curriculum Architecture - WordPress-ready snippet
+  Paste the entire contents of this file into a "Custom HTML" block in the
+  WordPress block editor (or an HTML widget in Elementor / Divi / etc.).
+  All CSS is scoped to .adsai-curriculum so it will not bleed into / out of
+  your theme. All JS is wrapped in an IIFE; nothing is added to window.*
+-->
+<div class="adsai-curriculum" role="region" aria-label="BS ADSAI Curriculum Architecture">
+
+<style>
+/* ============================================================
+   SCOPED STYLES - all selectors prefixed with .adsai-curriculum
+   ============================================================ */
+.adsai-curriculum {
+  /* Baruch / Zicklin brand tokens (scoped) */
+  --ac-baruch-blue: #003DA5;
+  --ac-baruch-navy: #002664;
+  --ac-baruch-gold: #E2A100;
+  --ac-baruch-gold-soft: #F4D58A;
+  --ac-serif: "Bernhard Modern", "Adelle PE", Georgia, "Times New Roman", serif;
+  --ac-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Open Sans", Arial, sans-serif;
+
+  --ac-ink: #1a1a1a;
+  --ac-muted: #4b5563;
+  --ac-line: #d6d9de;
+  --ac-bg: #f6f4ef;
+  --ac-panel: #ffffff;
+
+  /* Category accents -- kept for scannability */
+  --ac-c-req: #2C4A99;
+  --ac-c-flex: #5894E0;
+  --ac-c-col: #6FC2E8;
+  --ac-c-pre: #E8970D;
+  --ac-c-mc: #2D5F3F;
+  --ac-c-found: #3CA85F;
+  --ac-c-focus: #94D9A4;
+  --ac-c-conc: #8755D6;
+  --ac-c-cap: #C53030;
+  --ac-c-free: #A0A6B0;
+  --ac-c-tab-bar: #b8c5e0;
+  --ac-c-tab-active-bar: var(--ac-baruch-blue);
+  --ac-warn: #B45309;
+
+  font-family: var(--ac-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ac-ink);
+  background: var(--ac-bg);
+  padding: 40px 48px;
+  box-sizing: border-box;
+}
+.adsai-curriculum *,
+.adsai-curriculum *::before,
+.adsai-curriculum *::after { box-sizing: border-box; }
+
+/* Header */
+.adsai-curriculum .ac-header { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 3px solid var(--ac-baruch-blue); position: relative; }
+.adsai-curriculum .ac-header::after { content: ""; position: absolute; bottom: -3px; left: 0; width: 120px; height: 3px; background: var(--ac-baruch-gold); }
+.adsai-curriculum .ac-header-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.adsai-curriculum .ac-brand { font-family: var(--ac-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ac-baruch-blue); margin-bottom: 8px; }
+.adsai-curriculum .ac-title { font-family: var(--ac-serif); font-size: 34px; font-weight: 700; color: var(--ac-baruch-navy); line-height: 1.15; letter-spacing: -0.01em; margin: 0; }
+.adsai-curriculum .ac-subtitle { font-family: var(--ac-serif); font-size: 20px; font-style: italic; font-weight: 400; color: var(--ac-c-conc); margin-top: 6px; }
+.adsai-curriculum .ac-meta-stats { text-align: right; font-size: 14px; font-weight: 500; color: var(--ac-muted); line-height: 1.65; }
+.adsai-curriculum .ac-meta-stats .ac-total { font-family: var(--ac-serif); font-size: 22px; font-weight: 700; color: var(--ac-baruch-navy); letter-spacing: -0.005em; }
+
+.adsai-curriculum .ac-instruction { font-family: var(--ac-serif); font-size: 19px; font-weight: 600; font-style: italic; color: var(--ac-baruch-navy); margin: 12px 0 18px; }
+.adsai-curriculum .ac-divider { border: none; height: 2px; background: var(--ac-baruch-blue); margin: 28px 0; border-radius: 2px; position: relative; }
+.adsai-curriculum .ac-divider::after { content: ""; position: absolute; left: 0; top: -1px; width: 80px; height: 4px; background: var(--ac-baruch-gold); border-radius: 2px; }
+
+/* Tabs */
+.adsai-curriculum .ac-tabs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+.adsai-curriculum .ac-tab-btn { flex: 1 1 0; min-width: 120px; padding: 14px 10px; font-size: 14px; font-weight: 700; font-family: var(--ac-sans); letter-spacing: 0.02em; border: 1px solid var(--ac-line); border-top: 5px solid var(--ac-c-tab-bar); border-radius: 4px; background: var(--ac-panel); color: var(--ac-baruch-navy); cursor: pointer; text-align: center; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.03); line-height: 1.25; }
+.adsai-curriculum .ac-tab-btn:hover:not(.ac-active) { border-color: var(--ac-baruch-blue); border-top-color: var(--ac-baruch-blue); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 61, 165, 0.12); }
+.adsai-curriculum .ac-tab-btn.ac-active { background: #fff; color: var(--ac-baruch-blue); border-color: var(--ac-baruch-blue); border-top-color: var(--ac-baruch-blue); box-shadow: 0 4px 12px rgba(0, 61, 165, 0.18); position: relative; }
+.adsai-curriculum .ac-tab-btn.ac-active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--ac-baruch-gold); border-radius: 0 0 4px 4px; }
+.adsai-curriculum .ac-tab-btn:focus-visible { outline: 3px solid var(--ac-baruch-gold); outline-offset: 2px; }
+
+/* 4-column grid */
+.adsai-curriculum .ac-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.adsai-curriculum .ac-col { display: flex; flex-direction: column; gap: 16px; }
+.adsai-curriculum .ac-col-title { font-family: var(--ac-sans); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; border-bottom: 2px solid var(--ac-baruch-blue); padding-bottom: 8px; margin-bottom: 6px; color: var(--ac-baruch-navy); }
+
+/* Pillars */
+.adsai-curriculum .ac-pillar { background: var(--ac-panel); border: 1px solid var(--ac-line); border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.adsai-curriculum .ac-pillar-head { padding: 14px 18px; border-bottom: 1px solid var(--ac-line); display: flex; justify-content: space-between; align-items: center; border-top: 4px solid var(--ac-c, var(--ac-c-req)); background: #fdfdfd; cursor: pointer; user-select: none; font-family: inherit; width: 100%; text-align: left; transition: background .15s; }
+.adsai-curriculum .ac-pillar-head:hover { background: #f1f2f5; }
+.adsai-curriculum .ac-pillar-head:focus-visible { outline: 3px solid var(--ac-baruch-gold); outline-offset: -3px; }
+.adsai-curriculum .ac-pillar-head-left { display: flex; align-items: center; gap: 10px; }
+.adsai-curriculum .ac-pillar-name { font-family: var(--ac-serif); font-size: 17px; font-weight: 700; color: var(--ac-baruch-navy); letter-spacing: -0.005em; }
+.adsai-curriculum .ac-pillar-cr { font-family: var(--ac-sans); font-size: 12px; font-weight: 700; color: var(--ac-baruch-navy); background: var(--ac-baruch-gold-soft); padding: 3px 9px; border-radius: 2px; letter-spacing: 0.02em; }
+/* CSS-drawn chevron (no Unicode glyph - safe across encodings) */
+.adsai-curriculum .ac-chevron { display: inline-block; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 7px solid var(--ac-baruch-navy); transition: transform 0.2s ease; margin-left: 4px; flex-shrink: 0; }
+.adsai-curriculum .ac-pillar.ac-collapsed .ac-chevron { transform: rotate(-90deg); }
+.adsai-curriculum .ac-pillar.ac-collapsed .ac-course-list,
+.adsai-curriculum .ac-pillar.ac-collapsed .ac-sub-list-hdr { display: none; }
+.adsai-curriculum .ac-pillar.ac-collapsed .ac-pillar-head { border-bottom: none; }
+
+/* Courses */
+.adsai-curriculum .ac-course-list { list-style: none; padding: 10px 12px; margin: 0; }
+.adsai-curriculum .ac-course { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 8px; border-radius: 2px; }
+.adsai-curriculum .ac-course:hover { background: #f6f8fc; }
+.adsai-curriculum .ac-course:not(:last-child) { border-bottom: 1px dashed #e8eaef; }
+.adsai-curriculum .ac-c-info { display: flex; flex-direction: column; gap: 3px; padding-right: 12px; }
+.adsai-curriculum .ac-c-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 700; color: var(--ac-baruch-blue); letter-spacing: 0.01em; }
+.adsai-curriculum .ac-c-title { font-family: var(--ac-sans); font-size: 13px; font-weight: 500; color: var(--ac-ink); display: flex; align-items: center; }
+.adsai-curriculum .ac-c-meta { font-size: 11.5px; color: var(--ac-warn); font-weight: 600; margin-top: 3px; line-height: 1.35; font-style: italic; }
+.adsai-curriculum .ac-c-cr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 700; color: var(--ac-baruch-navy); background: var(--ac-bg); padding: 3px 8px; border-radius: 2px; border: 1px solid var(--ac-line); height: max-content; }
+
+/* Footnotes */
+.adsai-curriculum .ac-footnotes { margin-top: 36px; padding: 20px 26px; background: var(--ac-panel); border: 1px solid var(--ac-line); border-left: 4px solid var(--ac-baruch-gold); border-radius: 2px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 28px; }
+.adsai-curriculum .ac-fn-item { font-size: 13px; color: var(--ac-muted); display: flex; gap: 10px; align-items: flex-start; line-height: 1.55; }
+.adsai-curriculum .ac-fn-item strong { font-family: var(--ac-serif); color: var(--ac-baruch-navy); font-weight: 700; font-size: 14px; }
+/* Footnote icon - styled "!" in gold circle, no Unicode glyph */
+.adsai-curriculum .ac-fn-icon { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--ac-baruch-gold); color: #fff; font-family: var(--ac-sans); font-weight: 800; font-size: 13px; line-height: 1; border-radius: 50%; flex-shrink: 0; margin-top: 1px; }
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .adsai-curriculum { padding: 24px; }
+  .adsai-curriculum .ac-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .adsai-curriculum .ac-header-top { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .adsai-curriculum .ac-meta-stats { text-align: left; }
+  .adsai-curriculum .ac-title { font-size: 24px; }
+  .adsai-curriculum .ac-subtitle { font-size: 16px; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .adsai-curriculum { padding: 16px; font-size: 14px; }
+  .adsai-curriculum .ac-title { font-size: 20px; line-height: 1.25; }
+  .adsai-curriculum .ac-brand { font-size: 12px; }
+  .adsai-curriculum .ac-subtitle { font-size: 15px; }
+  .adsai-curriculum .ac-meta-stats { font-size: 13px; }
+  .adsai-curriculum .ac-meta-stats .ac-total { font-size: 16px; }
+  .adsai-curriculum .ac-header { gap: 12px; margin-bottom: 16px; padding-bottom: 12px; }
+  .adsai-curriculum .ac-instruction { font-size: 16px; margin-bottom: 12px; }
+  .adsai-curriculum .ac-divider { margin: 20px 0; height: 4px; }
+  .adsai-curriculum .ac-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; gap: 6px; padding-bottom: 6px; }
+  .adsai-curriculum .ac-tab-btn { flex: 0 0 auto; min-width: 110px; padding: 10px 12px; font-size: 13px; border-top-width: 4px; scroll-snap-align: start; }
+  .adsai-curriculum .ac-grid { grid-template-columns: 1fr; gap: 16px; }
+  .adsai-curriculum .ac-col { gap: 12px; }
+  .adsai-curriculum .ac-col-title { font-size: 14px; padding-bottom: 6px; }
+  .adsai-curriculum .ac-pillar-head { padding: 10px 12px; }
+  .adsai-curriculum .ac-pillar-name { font-size: 14px; }
+  .adsai-curriculum .ac-pillar-cr { font-size: 12px; padding: 2px 6px; }
+  .adsai-curriculum .ac-course { padding: 8px 6px; gap: 8px; }
+  .adsai-curriculum .ac-c-code { font-size: 12.5px; }
+  .adsai-curriculum .ac-c-title { font-size: 12px; }
+  .adsai-curriculum .ac-c-meta { font-size: 11px; }
+  .adsai-curriculum .ac-c-cr { font-size: 12px; padding: 2px 5px; }
+  .adsai-curriculum .ac-course-list { padding: 6px; }
+  .adsai-curriculum .ac-footnotes { grid-template-columns: 1fr; padding: 14px 16px; gap: 12px; margin-top: 24px; }
+  .adsai-curriculum .ac-fn-item { font-size: 12.5px; }
+}
+
+/* Touch */
+@media (hover: none) and (pointer: coarse) {
+  .adsai-curriculum .ac-pillar-head { min-height: 44px; }
+  .adsai-curriculum .ac-tab-btn { min-height: 44px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .adsai-curriculum *,
+  .adsai-curriculum *::before,
+  .adsai-curriculum *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<header class="ac-header">
+  <div class="ac-header-top">
+    <div>
+      <div class="ac-brand">Baruch College &nbsp;|&nbsp; Zicklin School of Business</div>
+      <h2 class="ac-title">BS in Applied Data Science &amp; AI</h2>
+      <div class="ac-subtitle" data-ac="subtitle">Cognitive Neuroscience Concentration</div>
+    </div>
+    <div class="ac-meta-stats">
+      <div class="ac-total">120 Total Credits</div>
+      <div data-ac="totals">42 Pathways / 49 Major / 19 Specialization / 10 Capstone &amp; Free</div>
+    </div>
+  </div>
+</header>
+
+<div class="ac-instruction">Choose a concentration to see its course breakdown:</div>
+
+<div class="ac-tabs" role="tablist" aria-label="Concentrations">
+  <button class="ac-tab-btn" role="tab" data-ac-key="business_psychology">Business<br>Psychology</button>
+  <button class="ac-tab-btn ac-active" role="tab" data-ac-key="cognitive_neuroscience" aria-selected="true">Cognitive<br>Neuroscience</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="cybersecurity">Cybersecurity</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="entrepreneurship">Entrepreneurship</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="journalism">Journalism</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="marketing">Marketing</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="operations">Operations &amp;<br>Analytics</button>
+  <button class="ac-tab-btn" role="tab" data-ac-key="public_policy">Public<br>Policy</button>
+</div>
+
+<hr class="ac-divider">
+
+<div class="ac-grid">
+
+  <div class="ac-col">
+    <div class="ac-col-title">1. Pathways (42 cr)</div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-req)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">Required Core</span><span class="ac-pillar-cr">12 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">ENG 2100</span><span class="ac-c-title">English Composition I</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">ENG 2150</span><span class="ac-c-title">English Composition II</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Math / Quant. Reasoning</span><span class="ac-c-title">PSY/BIO/ENV 2100 or STA 2000</span><span class="ac-c-meta" data-ac="pathways-meta-1"></span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Life/Physical Science</span><span class="ac-c-title">Approved science course</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-flex)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">Flexible Core</span><span class="ac-pillar-cr">18 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Scientific World</span><span class="ac-c-title">e.g., PSY 1001</span><span class="ac-c-meta" data-ac="pathways-meta-2"></span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">World Cultures and Global Issues</span><span class="ac-c-title">Flex Core bucket</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">U.S. Experience in its Diversity</span><span class="ac-c-title">Flex Core bucket</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Creative Expression</span><span class="ac-c-title">Flex Core bucket</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">The Individual and Society</span><span class="ac-c-title">Flex Core bucket</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">6th flex core elective</span><span class="ac-c-title">Choose from any approved bucket</span><span class="ac-c-meta" data-ac="pathways-meta-3"></span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-col)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">College Option</span><span class="ac-pillar-cr">12 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">ENG 2800 / 2850</span><span class="ac-c-title">Great Works of Literature</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Liberal Arts Electives (x2)</span><span class="ac-c-title">4000-level Minor courses</span></div><span class="ac-c-cr">6</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">College Option Capstone</span><span class="ac-c-title">4000-level culminating course</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ac-col">
+    <div class="ac-col-title">2. ADSAI Major (49 cr)</div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-pre)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">Pre-BS Entry / Min GPA 3.0</span><span class="ac-pillar-cr">10 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">MTH 2600 / 2610</span><span class="ac-c-title">Calculus I</span></div><span class="ac-c-cr">4</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 2300 / MTH 3300</span><span class="ac-c-title">Programming</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 3400</span><span class="ac-c-title">Database Management Systems</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-mc)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">ADSAI Core</span><span class="ac-pillar-cr">15 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">MTH 3210 / 4100</span><span class="ac-c-title">Linear Algebra</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">MTH 2301 / 3150 / STA 3250</span><span class="ac-c-title">Discrete Mathematics</span><span class="ac-c-meta">STA 3250 is Non-LAS</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">MTH 3120 / 4120 / STA 3154</span><span class="ac-c-title">Probability</span><span class="ac-c-meta">STA 3154 is Non-LAS</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">Ethics Course</span><span class="ac-c-title">PHI 3280, PHI/PSY 3290, etc.</span><span class="ac-c-meta" data-ac="ethics-meta"></span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">COM 1010</span><span class="ac-c-title">Speech Communication</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-found)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">ADSAI Foundation</span><span class="ac-pillar-cr">15 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">STA 3000</span><span class="ac-c-title">Statistical Computing</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 3920 / STA 3950</span><span class="ac-c-title">Machine Learning Analytics</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 3555</span><span class="ac-c-title">AI for Business</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">OPM 3510</span><span class="ac-c-title">Sequential Decision Analytics</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">STA 4155 / MTH 4130</span><span class="ac-c-title">Regression &amp; Forecasting</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+
+    <div class="ac-pillar ac-collapsed" style="--ac-c: var(--ac-c-focus)">
+      <button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">
+        <span class="ac-pillar-head-left"><span class="ac-pillar-name">ADSAI Electives</span><span class="ac-pillar-cr">Choose 3 / 9 cr</span></span>
+        <span class="ac-chevron" aria-hidden="true"></span>
+      </button>
+      <ul class="ac-course-list">
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 3120</span><span class="ac-c-title">Programming for Analytics</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 4100</span><span class="ac-c-title">Data Structures and Algorithms</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 4120</span><span class="ac-c-title">Applied NLP</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 4130</span><span class="ac-c-title">Big Data Technologies</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 4170</span><span class="ac-c-title">Data Visualization</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">CIS 4400</span><span class="ac-c-title">Data Warehousing</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">STA 4157</span><span class="ac-c-title">Experimental Design for ML</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">STA 4158</span><span class="ac-c-title">Analysis of Time Series</span></div><span class="ac-c-cr">3</span></li>
+        <li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">STA 4950</span><span class="ac-c-title">Machine Learning and AI</span></div><span class="ac-c-cr">3</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ac-col">
+    <div class="ac-col-title" data-ac="col3-title">3. Specialization (19 cr)</div>
+    <div data-ac="col3-content" style="display:flex; flex-direction:column; gap:16px;"></div>
+  </div>
+
+  <div class="ac-col">
+    <div class="ac-col-title" data-ac="col4-title">4. Capstone &amp; Free (10 cr)</div>
+    <div data-ac="col4-content" style="display:flex; flex-direction:column; gap:16px;"></div>
+  </div>
+
+</div>
+
+<div class="ac-footnotes">
+  <div class="ac-fn-item">
+    <span class="ac-fn-icon" aria-hidden="true">!</span>
+    <div><strong>Pre-BS Entry GPA</strong><br>A combined GPA across Calc I, Programming, and CIS 3400 must be at least 3.0 to enter the ADSAI major.</div>
+  </div>
+  <div class="ac-fn-item">
+    <span class="ac-fn-icon" aria-hidden="true">!</span>
+    <div><strong>Non-LAS Alternatives</strong><br>STA 3250 and STA 3154 do not carry Liberal Arts designation. Free electives must offset this to reach the 60-credit LAS minimum.</div>
+  </div>
+  <div class="ac-fn-item">
+    <span class="ac-fn-icon" aria-hidden="true">!</span>
+    <div><strong>Pathways Alignment</strong><br><span data-ac="fn-pathways">Concentrations often require specific Pathways courses (e.g., PSY 1001 and PSY 2100 for Cognitive Neuroscience).</span></div>
+  </div>
+</div>
+
+</div><!-- /.adsai-curriculum -->
+
+<script>
+/* IIFE - keeps everything off window.* so it cannot collide with theme/plugin JS */
+(function(){
+  'use strict';
+  // Scope all queries to THIS instance only (supports multiple instances on one page)
+  var roots = document.querySelectorAll('.adsai-curriculum');
+  roots.forEach(function(root){
+    if (root.dataset.acInit === '1') return;
+    root.dataset.acInit = '1';
+
+    var concentrations = {
+      "business_psychology": {
+        name: "Business Psychology", reqCr: 10, elecCr: 6, capCr: 3,
+        req: [
+          {code: "PSY 3001", title: "Research Methods in Psychology", cr: 4},
+          {code: "PSY 3181", title: "Industrial & Organizational Psych", cr: 3},
+          {code: "PSY 3056", title: "Social Psychology", cr: 3}
+        ],
+        elecTitle: "Choose 2 / 6 cr",
+        elec: [
+          {code: "PSY 3064", title: "Personality & Individual Differences", cr: 3},
+          {code: "PSY 3151", title: "Financial Psychology", cr: 3},
+          {code: "PSY 3036", title: "Psychology of Culture", cr: 3},
+          {code: "PSY 3069", title: "Psychology of Law", cr: 3}
+        ],
+        capTitle: "Choose 1 / 3 cr",
+        cap: [
+          {code: "PSY 4013", title: "Advanced Personnel Psychology", cr: 3},
+          {code: "PSY 4181", title: "Advanced Organizational Psychology", cr: 3},
+          {code: "PSY 4182", title: "Occupational Health Psychology", cr: 3},
+          {code: "PSY 4183", title: "Psych of Career Development", cr: 3}
+        ]
+      },
+      "cognitive_neuroscience": {
+        name: "Cognitive Neuroscience", reqCr: 10, elecCr: 6, capCr: 3,
+        req: [
+          {code: "PSY 3001", title: "Research Methods in Psychology", cr: 4},
+          {code: "PSY 3081", title: "Cognitive Psychology", cr: 3},
+          {code: "PSY 3082", title: "Mind, Brain, and Behavior", cr: 3}
+        ],
+        elecTitle: "Choose 2 / 6 cr",
+        elec: [
+          {code: "PSY 3067", title: "Psych of Learning & Motivation", cr: 3},
+          {code: "PSY 3083", title: "Psychology of Learning", cr: 3},
+          {code: "PSY 3185", title: "Environmental Psychology", cr: 3}
+        ],
+        capTitle: "Choose 1 / 3 cr",
+        cap: [
+          {code: "PSY 4080", title: "Sensation and Perception", cr: 3},
+          {code: "PSY 3040", title: "Special Topics: Memory & Attention", cr: 3},
+          {code: "PSY 3040", title: "Special Topics: Decision Making", cr: 3}
+        ]
+      },
+      "cybersecurity": {
+        name: "Cybersecurity", reqCr: 15, elecCr: 6, capCr: 0,
+        req: [
+          {code: "CIS 3500", title: "Computer Networking", cr: 3},
+          {code: "CIS 3550", title: "Cybersecurity", cr: 3},
+          {code: "CIS 3800", title: "Cloud Computing", cr: 3},
+          {code: "CIS 4350", title: "IT Audit", cr: 3},
+          {code: "CIS 4560", title: "Ethical Hacking", cr: 3}
+        ],
+        elecTitle: "Choose 2 / 6 cr",
+        elec: [
+          {code: "CIS 3770", title: "Usability, Privacy and Security", cr: 3},
+          {code: "CIS 4093", title: "Special Topics on Software Eng.", cr: 3},
+          {code: "CIS 4160", title: "Web App Development", cr: 3},
+          {code: "CIS 4510", title: "Digital Forensics", cr: 3},
+          {code: "LAW 3108", title: "Law and the Internet", cr: 3}
+        ],
+        capTitle: "", cap: []
+      },
+      "entrepreneurship": {
+        name: "Entrepreneurship", reqCr: 9, elecCr: 12, capCr: 0,
+        req: [
+          {code: "ENT 3950", title: "Developing an Entrepreneurial Mindset", cr: 3},
+          {code: "ENT 3952", title: "Designing for Innovation", cr: 3},
+          {code: "ENT 3960", title: "An Entrepreneurial Pre-Launch Journey", cr: 3}
+        ],
+        elecTitle: "Choose 4 / 12 cr",
+        elec: [
+          {code: "ENT 3962", title: "Family Enterprise Dynamics", cr: 3},
+          {code: "ENT 3963", title: "Forecasting and Futuring", cr: 3},
+          {code: "ENT 3968", title: "The Art of Persuasion", cr: 3},
+          {code: "ENT 3971", title: "Multicultural Entrepreneurial Exp.", cr: 3},
+          {code: "ENT 3993", title: "Special Topics in Entrepreneurship", cr: 3},
+          {code: "ENT 4954", title: "New Venture Funding", cr: 3},
+          {code: "ENT 4960", title: "New Venture Management", cr: 3},
+          {code: "ENT 4967", title: "Tech and Innovation in Entrepreneurship", cr: 3},
+          {code: "ENT 4969", title: "Social Entrepreneurship", cr: 3}
+        ],
+        capTitle: "", cap: []
+      },
+      "journalism": {
+        name: "Journalism", reqCr: 10, elecCr: 10, capCr: 0,
+        req: [
+          {code: "JRN 2500", title: "The Individual and the News", cr: 3},
+          {code: "JRN 3050/3200", title: "Reporting / Bus & Fin Journalism", cr: 4},
+          {code: "JRN 3220", title: "Media Ethics and Law", cr: 3}
+        ],
+        elecTitle: "Choose 3 / 9-10 cr",
+        elec: [
+          {code: "JRN 3201/3202", title: "Covering Financial Markets / Wealth", cr: 3},
+          {code: "JRN 3510/3530", title: "Multimedia Reporting / Podcasting", cr: 4},
+          {code: "HIS 3053", title: "American History 1945 - present", cr: 3},
+          {code: "HIS 3074", title: "From Silver to Cocaine", cr: 3},
+          {code: "HIS 3410", title: "History of American Business Ent.", cr: 3},
+          {code: "POL 2353", title: "Public Policy", cr: 3},
+          {code: "POL 3103", title: "Political Economy", cr: 3},
+          {code: "POL 3220", title: "State and Local Government", cr: 3}
+        ],
+        capTitle: "", cap: []
+      },
+      "marketing": {
+        name: "Marketing", reqCr: 9, elecCr: 12, capCr: 0,
+        req: [
+          {code: "MKT 3000", title: "Marketing Foundations", cr: 3},
+          {code: "MKT 3600", title: "Marketing Info for Decision Making", cr: 3},
+          {code: "MKT 3620", title: "Digital Transformation of Marketing", cr: 3}
+        ],
+        elecTitle: "Choose 4 / 12 cr",
+        elec: [
+          {code: "MKT 4123", title: "Marketing Web Analytics & Intelligence", cr: 3},
+          {code: "MKT 4555", title: "Advanced Digital Marketing", cr: 3},
+          {code: "MKT 4557", title: "Digital Advertising", cr: 3},
+          {code: "MKT 4561", title: "Marketing Analytics", cr: 3},
+          {code: "MKT 4620", title: "Text Analytics for Marketing", cr: 3},
+          {code: "MKT 4630", title: "Marketing Analytics with Big Data", cr: 3}
+        ],
+        capTitle: "", cap: []
+      },
+      "operations": {
+        name: "Operations Analytics", reqCr: 12, elecCr: 9, capCr: 0,
+        req: [
+          {code: "OPM 3000", title: "Service Operations Management", cr: 3},
+          {code: "OPM 3730", title: "Business Process Analysis", cr: 3},
+          {code: "OPM 3750", title: "Improving Business Processes", cr: 3},
+          {code: "OPM 4550", title: "Advanced Managerial Decision Making", cr: 3}
+        ],
+        elecTitle: "Choose 3 / 9 cr",
+        elec: [
+          {code: "OPM 3710", title: "Supply Chain Management", cr: 3},
+          {code: "OPM 3740", title: "Project Management", cr: 3},
+          {code: "OPM 4500", title: "Cases in Operations Management", cr: 3},
+          {code: "OPM 4551", title: "Operations Management Consulting", cr: 3}
+        ],
+        capTitle: "", cap: []
+      },
+      "public_policy": {
+        name: "Public Policy", reqCr: 12, elecCr: 9, capCr: 0,
+        req: [
+          {code: "PAF 3010", title: "Race, Inequality and Public Policy", cr: 3},
+          {code: "PAF 3015", title: "Qualitative Studies of Communities", cr: 3},
+          {code: "PAF 3102", title: "Economic Analysis of Public Policy", cr: 3},
+          {code: "PAF 3108", title: "Strategic Comm for Public Causes", cr: 3}
+        ],
+        elecTitle: "Choose 3 / 9 cr",
+        elec: [
+          {code: "PAF 3006", title: "Public Service and Why it Matters", cr: 3},
+          {code: "PAF 3018", title: "Immigrant Cities", cr: 3},
+          {code: "PAF 3021", title: "Civic Engagement & Participatory Budget", cr: 3},
+          {code: "PAF 3100", title: "Nonprofit Administration", cr: 3},
+          {code: "PAF 3103", title: "Economics of the Public Sector", cr: 3},
+          {code: "PAF 3195", title: "Energy, Climate, and Society", cr: 3},
+          {code: "PAF 3375", title: "Housing and Community Dev Policy", cr: 3},
+          {code: "PAF 3402", title: "Policy Analysis", cr: 3},
+          {code: "PAF 3442", title: "Cities and Sustainability", cr: 3},
+          {code: "PAF 3710", title: "Reforming Education", cr: 3}
+        ],
+        capTitle: "", cap: []
+      }
+    };
+
+    function $(sel){ return root.querySelector(sel); }
+    function $$(sel){ return root.querySelectorAll(sel); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+
+    // Pillar collapse via event delegation
+    root.addEventListener('click', function(e){
+      var head = e.target.closest('[data-ac-toggle]');
+      if (head && root.contains(head)) {
+        var pillar = head.closest('.ac-pillar');
+        var collapsed = pillar.classList.toggle('ac-collapsed');
+        head.setAttribute('aria-expanded', String(!collapsed));
+        return;
+      }
+      var tab = e.target.closest('.ac-tab-btn');
+      if (tab && root.contains(tab)) {
+        updateConcentration(tab.getAttribute('data-ac-key'));
+      }
+    });
+
+    // Keyboard nav for tabs
+    root.addEventListener('keydown', function(e){
+      var tab = e.target.closest('.ac-tab-btn');
+      if (!tab) return;
+      var tabs = Array.prototype.slice.call($$('.ac-tab-btn'));
+      var i = tabs.indexOf(tab);
+      var next = null;
+      if (e.key === 'ArrowRight') next = tabs[(i+1) % tabs.length];
+      else if (e.key === 'ArrowLeft') next = tabs[(i-1+tabs.length) % tabs.length];
+      else if (e.key === 'Home') next = tabs[0];
+      else if (e.key === 'End') next = tabs[tabs.length-1];
+      if (next) { e.preventDefault(); next.focus(); next.click(); }
+    });
+
+    function buildCourseLi(c){
+      return '<li class="ac-course"><div class="ac-c-info"><span class="ac-c-code">' +
+        escapeHtml(c.code) + '</span><span class="ac-c-title">' + escapeHtml(c.title) +
+        '</span>' + (c.meta ? '<span class="ac-c-meta">' + escapeHtml(c.meta) + '</span>' : '') +
+        '</div><span class="ac-c-cr">' + escapeHtml(c.cr) + '</span></li>';
+    }
+
+    function buildPillar(name, cr, courses, colorVar){
+      return '<div class="ac-pillar ac-collapsed" style="--ac-c: var(--' + colorVar + ')">' +
+        '<button type="button" class="ac-pillar-head" data-ac-toggle aria-expanded="false">' +
+          '<span class="ac-pillar-head-left"><span class="ac-pillar-name">' + escapeHtml(name) +
+          '</span><span class="ac-pillar-cr">' + escapeHtml(cr) + '</span></span>' +
+          '<span class="ac-chevron" aria-hidden="true"></span>' +
+        '</button>' +
+        '<ul class="ac-course-list">' + courses.map(buildCourseLi).join('') + '</ul>' +
+      '</div>';
+    }
+
+    function updateConcentration(key){
+      $$('.ac-tab-btn').forEach(function(b){
+        var sel = b.getAttribute('data-ac-key') === key;
+        b.classList.toggle('ac-active', sel);
+        b.setAttribute('aria-selected', String(sel));
+      });
+
+      var data = concentrations[key];
+      var specTotalCr = data.reqCr + data.elecCr + data.capCr;
+      var addtlCr = 29 - specTotalCr;
+
+      $('[data-ac="subtitle"]').textContent = data.name + ' Concentration';
+      $('[data-ac="col3-title"]').textContent = '3. Specialization (' + specTotalCr + ' cr)';
+      $('[data-ac="col4-title"]').textContent = '4. Capstone & Free (' + addtlCr + ' cr)';
+      $('[data-ac="totals"]').textContent = '42 Pathways / 49 Major / ' + specTotalCr + ' Specialization / ' + addtlCr + ' Capstone & Free';
+
+      var isPsych = (key === 'business_psychology' || key === 'cognitive_neuroscience');
+      $('[data-ac="pathways-meta-1"]').textContent = isPsych ? 'PSY 2100 Recommended' : '';
+      $('[data-ac="pathways-meta-2"]').textContent = isPsych ? 'PSY 1001 Recommended' : '';
+      $('[data-ac="pathways-meta-3"]').textContent = key === 'journalism' ? 'HIS 1000-level Rec.' : '';
+      $('[data-ac="ethics-meta"]').textContent = isPsych ? 'PSY 3290 Recommended' : '';
+
+      var fnText = "No specific Pathways requirements for this concentration.";
+      if (isPsych) fnText = 'Requires PSY 1001 and PSY 2100 as Pathways courses for the ' + data.name + ' concentration.';
+      else if (key === 'journalism') fnText = "Recommends taking at least one 1000-level HIS course in the Flexible Core to support Journalism electives.";
+      $('[data-ac="fn-pathways"]').textContent = fnText;
+
+      var col3 = '';
+      col3 += buildPillar(data.name + ' Req.', data.reqCr + ' cr', data.req, 'ac-c-conc');
+      if (data.elec && data.elec.length) col3 += buildPillar(data.name + ' Electives', data.elecTitle, data.elec, 'ac-c-conc');
+      if (data.cap && data.cap.length) col3 += buildPillar(data.name + ' Capstone', data.capTitle, data.cap, 'ac-c-conc');
+      $('[data-ac="col3-content"]').innerHTML = col3;
+
+      var col4 = '';
+      var capstoneCourses = (key === 'entrepreneurship')
+        ? [{code: 'ENT 5985', title: 'Entrepreneurship in the Wild', cr: 3, meta: 'Required for ENT Concentration'}]
+        : [{code: 'CIS 5800 / 5000', title: 'IT Dev & Project Management', cr: 3}];
+      col4 += buildPillar('ADSAI Major Capstone', '3 cr', capstoneCourses, 'ac-c-cap');
+
+      var freeCr = addtlCr - 3;
+      var freeCourses = [];
+      if (freeCr > 0) {
+        var remaining = freeCr, count = 1;
+        while (remaining > 0) {
+          var cr = remaining >= 4 ? (remaining % 3 === 0 ? 3 : (remaining === 4 ? 4 : 3)) : remaining;
+          freeCourses.push({code: 'Free Elective ' + count++, title: 'Any credit-bearing course', cr: cr});
+          remaining -= cr;
+        }
+      } else {
+        freeCourses.push({code: '', title: 'No free electives needed', cr: ''});
+      }
+      col4 += buildPillar('Free Electives', freeCr + ' cr', freeCourses, 'ac-c-free');
+      $('[data-ac="col4-content"]').innerHTML = col4;
+    }
+
+    updateConcentration('cognitive_neuroscience');
+  });
+})();
+</script>

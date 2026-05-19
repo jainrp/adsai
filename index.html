@@ -42,6 +42,7 @@ select.conc-select option { background: #0d1117; color: white; }
 .sidebar-course .ccode { color: rgba(255,255,255,0.6); font-family: monospace; font-size: 12px; font-weight: 700; display: block; }
 .sidebar-course .ctitle { display: block; font-weight: 500; font-size: 11px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.4); }
 
+.sidebar-toggle{display:none}
 .tool-btn{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:4px;font-size:12px;color:rgba(255,255,255,.5);background:transparent;border:1px solid rgba(255,255,255,.12);cursor:pointer;width:100%}
 .tool-btn:hover{background:rgba(255,255,255,.08);color:#fafaf7}
 .toolbar{margin-top:auto;display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
@@ -261,17 +262,139 @@ h1{font-size:22px;font-weight:600;line-height:1.2}
   .footnotes strong { display: block; color: #1a1a1a; font-weight: 600; font-size: 6pt; margin-bottom: 0.5pt; }
   .fn-mark { color: #6366f1; font-weight: 700; }
 }
+
+/* ============ RESPONSIVE: TABLET ============ */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .wrap { grid-template-columns: 220px 1fr; }
+  .dashboard { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: 1fr; }
+  .footnotes { grid-template-columns: 1fr; }
+  h1 { font-size: 20px; }
+  .stat-val { font-size: 18px; }
+}
+
+/* ============ RESPONSIVE: MOBILE ============ */
+@media (max-width: 640px) {
+  body { font-size: 14px; }
+
+  /* Stack sidebar above main content; release fixed heights */
+  .wrap { grid-template-columns: 1fr; min-height: 0; }
+  .sidebar {
+    height: auto;
+    max-height: none;
+    padding: 12px;
+    gap: 10px;
+    font-size: 12px;
+    position: relative;
+  }
+  .main {
+    height: auto;
+    overflow-y: visible;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  /* Collapsible sidebar on mobile */
+  .sidebar > div:first-child { display: flex; flex-direction: column; }
+  .sidebar.collapsed > *:not(:first-child):not(.sidebar-toggle) { display: none; }
+  .sidebar-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fafaf7;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sidebar-toggle::after { content: "▾"; }
+  .sidebar.collapsed .sidebar-toggle::after { content: "▸"; }
+
+  .brand-title { font-size: 15px; }
+  .brand-sub { font-size: 10px; margin-bottom: 0; }
+  .bank-container { max-height: 110px; }
+
+  /* Page header stacks */
+  .page-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .hdr-meta { text-align: left; white-space: normal; font-size: 11px; }
+  h1 { font-size: 18px; }
+  .eyebrow { font-size: 10px; }
+
+  /* Dashboard: 2x2 grid */
+  .dashboard { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .stat-card { padding: 8px 10px; }
+  .stat-val { font-size: 17px; }
+  .stat-val .u { font-size: 11px; }
+  .stat-lbl { font-size: 10px; }
+  .stat-sub { font-size: 10px; }
+
+  /* Legend wraps */
+  .legend { gap: 4px 8px; padding: 6px 8px; font-size: 11px; }
+  .legend-title { font-size: 10px; }
+
+  /* Semester grid: single column */
+  .grid { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Each semester: stack the 2-column inner layout */
+  .sem {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .rcol {
+    padding-left: 0;
+    padding-top: 8px;
+    border-left: none;
+    border-top: 0.5px solid var(--color-border-tertiary);
+  }
+  .sem-lbl { font-size: 14px; }
+  .sem-title { font-size: 10px; }
+
+  /* Courses: keep tappable */
+  .course { padding: 8px 8px; gap: 6px; min-height: 38px; }
+  .course .grip { display: none; }
+  .course-remove { opacity: 1; width: 22px; height: 22px; font-size: 14px; }
+  .ccode { font-size: 12.5px; }
+  .ctitle { font-size: 11px; white-space: normal; }
+
+  /* Footnotes single column */
+  .footnotes { grid-template-columns: 1fr; padding: 10px; font-size: 11px; }
+
+  /* Tooltip wider, less likely to overflow */
+  .tooltip { max-width: calc(100vw - 24px); font-size: 11px; }
+
+  /* Editor modal: fit small screens */
+  .editor { width: 100%; max-width: calc(100vw - 16px); padding: 16px; }
+  .gopt { width: 40px; height: 32px; }
+
+  /* Toast positioning */
+  .toast { font-size: 12px; padding: 8px 14px; max-width: calc(100vw - 24px); }
+}
+
+/* Touch-target sizing on coarse pointers */
+@media (hover: none) and (pointer: coarse) {
+  .course { min-height: 40px; }
+  .course-remove { opacity: 1; width: 22px; height: 22px; }
+  .tool-btn { min-height: 38px; }
+  .sopt, .btn { min-height: 36px; padding: 8px 12px; }
+}
 </style>
 </head>
 <body>
 
 <h2 class="sr-only">BS in ADSAI Multi-Concentration Degree Planner</h2>
 <div class="wrap">
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div>
     <div class="brand-sub">Baruch · Zicklin</div>
     <div class="brand-title">BS in Applied<br>Data Science &amp; AI</div>
   </div>
+  <button class="sidebar-toggle" id="sidebar-toggle" aria-expanded="true" aria-controls="sidebar" type="button" onclick="document.getElementById('sidebar').classList.toggle('collapsed'); this.setAttribute('aria-expanded', !document.getElementById('sidebar').classList.contains('collapsed'));">Menu</button>
   
   <div>
     <div class="nav-label">Select Concentration</div>

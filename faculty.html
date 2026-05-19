@@ -71,6 +71,76 @@
   .fn-item { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
   .fn-item strong { color: var(--ink); font-weight: 700; }
   .fn-icon { color: #B45309; font-weight: bold; }
+
+  /* Tablet (<=1024px): 2-column grid */
+  @media (max-width: 1024px) {
+    body { padding: 24px; }
+    .architecture-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .header-top { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .meta-stats { text-align: left; }
+    h1 { font-size: 24px; }
+    .subtitle { font-size: 16px; }
+  }
+
+  /* Mobile (<=640px): single column, stacked layout */
+  @media (max-width: 640px) {
+    body { padding: 16px; font-size: 14px; }
+    h1 { font-size: 20px; line-height: 1.25; }
+    .brand { font-size: 12px; }
+    .subtitle { font-size: 15px; }
+    .meta-stats { font-size: 13px; }
+    .meta-stats > div:first-child { font-size: 16px !important; }
+    .header { gap: 12px; margin-bottom: 16px; padding-bottom: 12px; }
+    .instruction-text { font-size: 16px; margin-bottom: 12px; }
+    .section-divider { margin: 20px 0; height: 4px; }
+
+    /* Tabs: horizontal scroll, allow finger swipe */
+    .tab-container {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      gap: 6px;
+      padding-bottom: 6px;
+      margin: 0 -16px;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    .tab-btn {
+      flex: 0 0 auto;
+      min-width: 110px;
+      padding: 10px 12px;
+      font-size: 13px;
+      border-top-width: 4px;
+      scroll-snap-align: start;
+    }
+
+    /* Stack architecture grid to a single column */
+    .architecture-grid { grid-template-columns: 1fr; gap: 16px; }
+    .group-col { gap: 12px; }
+    .group-title { font-size: 14px; padding-bottom: 6px; }
+
+    /* Pillars: tighter spacing */
+    .pillar-head { padding: 10px 12px; }
+    .pillar-name { font-size: 14px; }
+    .pillar-cr { font-size: 12px; padding: 2px 6px; }
+    .course { padding: 8px 6px; gap: 8px; }
+    .c-code { font-size: 12.5px; }
+    .c-title { font-size: 12px; }
+    .c-meta { font-size: 11px; }
+    .c-cr { font-size: 12px; padding: 2px 5px; }
+    .course-list { padding: 6px; }
+
+    /* Footnotes: single column */
+    .footnotes { grid-template-columns: 1fr; padding: 14px 16px; gap: 12px; margin-top: 24px; }
+    .fn-item { font-size: 12.5px; }
+  }
+
+  /* Larger tap targets on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .pillar-head { min-height: 44px; }
+    .tab-btn { min-height: 44px; }
+  }
 </style>
 </head>
 <body>
